@@ -1,167 +1,115 @@
 {
-    "week_1": {
-      "2025-07-18": {
-        "MAINSTAGE": [
-          "Alok",
-          "Artbat b2b Kölsch",
-          "Axwell",
-          "Daybreak: ANNA",
-          "Martin Garrix",
-          "Meduza",
-          "Mike Williams",
-          "NERVO",
-          "Odymel b2b Pegassi",
-          "Sub Zero Project",
-          "Vini Vici"
-        ],
-        "FREEDOM": [
-          "Eric Prydz",
-          "Esin Boz",
-          "HI-LO B2B Eli Brown",
-          "John Summit",
-          "Joris Voorn b2b Rose Ringed",
-          "Layla Benitez",
-          "Rivo",
-          "Semsei"
-        ],
-        "THE ROSE GARDEN": [
-          "1991",
-          "Andromedik",
-          "Camo & Krooked",
-          "Emily Makis",
-          "Idle Days",
-          "IVY",
-          "Metrik",
-          "Pirapus",
-          "Primate",
-          "Sennix",
-          "Sota b2b Basstripper",
-          "T & Sugah"
-        ],
-        "ELIXIR": [
-          "Annabel Stop It",
-          "Belgianly Made",
-          "C-Track",
-          "Cromanty Sound",
-          "Double D",
-          "Flavour Drop",
-          "Flo Windey ft. Skyve",
-          "Hunter",
-          "MC Rim",
-          "Soul Shakers",
-          "Walshy Fire"
-        ],
-        "THE RAVE CAVE": [
-          "Ben Malone",
-          "Horizontal Soundsystem",
-          "Kriss Reeve",
-          "Lou8",
-          "Luca v/d Hombergh",
-          "NOME.",
-          "The Rocketman"
-        ],
-        "CAGE": [
-          "Dr Donk",
-          "DRS b2b Sandy Warez",
-          "Pinotello",
-          "Revedge b2b Bazzy",
-          "Sacha Malice",
-          "Sakyra",
-          "Spitnoise",
-          "Suttlek b2b Revenja",
-          "The Dark Horror",
-          "Toxic Twins b2b NRKi",
-          "Unicorn On K"
-        ],
-        "RISE BY COCA-COLA": [
-          "Bastin",
-          "Christophe & Seelen",
-          "Disco Dasco",
-          "More to be announced",
-          "Rafi Khan",
-          "Roma",
-          "Romy Janssen",
-          "Vinnie",
-          "Yves Deruyter",
-          "ZT Music"
-        ],
-        "PLANAXIS": [
-          "Anii b2b Axel Haube",
-          "Arten",
-          "Brina Knauss",
-          "ELIF",
-          "Innellea",
-          "Laura Hoogland",
-          "Stephan Bodzin (live)"
-        ],
-        "ATMOSPHERE": [
-          "Azyr b2b Nico Moreno",
-          "Emilija",
-          "Fantasm",
-          "Faster horses",
-          "Hannah Laing",
-          "Holy Priest",
-          "Hurts",
-          "NOVAH",
-          "VIDO b2b BYØRN"
-        ],
-        "CRYSTAL GARDEN": [
-          "ANNA b2b Antdot",
-          "Arodes b2b Shimza",
-          "Austin Millz",
-          "Eridu",
-          "Franc Fala",
-          "Vintage Culture"
-        ],
-        "CORE": [
-          "Bora Uzer",
-          "Damian Lazarus",
-          "Jennifer Cardini",
-          "Laura Meester",
-          "Parallelle",
-          "Toolate Groove",
-          "Tripolism"
-        ],
-        "MOOSEBAR": [
-          "DJ Prosit",
-          "Kurt Verheyen",
-          "Tom Cosyns",
-          "Yves Segers"
-        ],
-        "MELODIA BY CORONA": [
-          "Aaron Sevilla",
-          "Alure",
-          "Arado",
-          "B'Elle",
-          "Block & Crown",
-          "James de Torres",
-          "Joezi",
-          "Lotte Feyen"
-        ],
-        "THE GREAT LIBRARY": [
-          "Dillon Francis b2b Marten Hørger",
-          "Hardwell",
-          "Jaden Bojsen",
-          "John Newman",
-          "Juicy M",
-          "MagiK",
-          "MANDY",
-          "Manuals",
-          "Matisse & Sadko b2b Third Party",
-          "Oliver Heldens",
-          "Pat Krimson",
-          "R3hab"
-        ],
-        "HOUSE OF FORTUNE BY JBL": [
-          "Broz",
-          "Cence Brothers",
-          "J8man",
-          "Jaden Bojsen",
-          "Junkie Kid",
-          "Little D",
-          "Makasi"
-        ]
-      }
+  "week_1": {
+    "2025-07-18": {
+      "MAINSTAGE": [
+        {
+          "id": "1",
+          "artists": [
+            {
+              "name": "Alok",
+              "artistId": "0NGAZxHanS9e0iNHpR8f2W"
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "artists": [
+            {
+              "name": "Artbat",
+              "artistId": "66kcQDmB3WcuoYPaNQqeH7"
+            },
+            {
+              "name": "Kölsch",
+              "artistId": "2D9Oe8R9UhbMvFAsMJpXj0"
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "artists": [
+            {
+              "name": "Axwell",
+              "artistId": "1xNmvlEiICkRlRGqlNFZ43"
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "artists": [
+            {
+              "name": "ANNA",
+              "artistId": "7K80yOTC0Id95gRaOxDG5u"
+            }
+          ]
+        },
+        {
+          "id": "5",
+          "artists": [
+            {
+              "name": "Martin Garrix",
+              "artistId": "60d24wfXkVzDSfLS6hyCjZ"
+            }
+          ]
+        },
+        {
+          "id": "6",
+          "artists": [
+            {
+              "name": "Meduza",
+              "artistId": "0xRXCcSX89eobfrshSVdyu"
+            }
+          ]
+        },
+        {
+          "id": "7",
+          "artists": [
+            {
+              "name": "Mike Williams",
+              "artistId": "3IpvVrP3VLhruTmnququq7"
+            }
+          ]
+        },
+        {
+          "id": "8",
+          "artists": [
+            {
+              "name": "NERVO",
+              "artistId": "4j5KBTO4tk7up54ZirNGvK"
+            }
+          ]
+        },
+        {
+          "id": "9",
+          "artists": [
+            {
+              "name": "Odymel",
+              "artistId": "7c4fOBUstnjfbvSwtOJSiA"
+            },
+            {
+              "name": "Pegassi",
+              "artistId": "2A4uiWrfuBpVFugyvxAt4c"
+            }
+          ]
+        },
+        {
+          "id": "10",
+          "artists": [
+            {
+              "name": "Sub Zero Project",
+              "artistId": "4f0OXMMSxr0r8Ztx6CdpAl"
+            }
+          ]
+        },
+        {
+          "id": "11",
+          "artists": [
+            {
+              "name": "Vini Vici",
+              "artistId": "29zsVzEH33dD5QqxeL8dvy"
+            }
+          ]
+        }
+      ]
     }
   }
-  
+}

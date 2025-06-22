@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import lineupData from "@/lib/lineup.json";
 
 interface Track {
     id: string;
@@ -14,17 +15,28 @@ interface Track {
     artists: { name: string }[];
 }
 
+interface Artist {
+    name: string;
+    artistId: string;
+}
+
+interface Performance {
+    id: string;
+    artists: Artist[];
+}
+
 export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
+    const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
 
-    // Search for tracks directly
-    async function searchTracks(artistId: string) {
-        const query = "charlotte de witte";
+
+    async function searchTracks(artistId: string, artistName: string) {
+        setSelectedArtist(artistName);
              
         try {
             const response = await fetch(
-                `/api/spotify-search?query=${encodeURIComponent(query)}&type=tracks&artistId=${artistId}`
+                `/api/spotify-search?artistId=${artistId}`
             );
             
             if (!response.ok) {
@@ -33,28 +45,115 @@ export default function Home() {
             }
             
             const data = await response.json();
-            setTracks((data.tracks || []).slice(0, 3));
+            setTracks(data.tracks || []);
             setPlayingTrack(null);
         } catch (err) {
             console.error("Error searching tracks:", err);
         }
     }
 
-    // Play selected track
     function playTrack(track: Track) {
         setPlayingTrack(track);
     }
 
+    function renderPerformance(performance: Performance) {
+        const { artists } = performance;
+        
+        if (artists.length === 1) {
+            // Single artist performance
+            const artist = artists[0];
+            return (
+                <span
+                    key={artist.artistId}
+                    onClick={() => searchTracks(artist.artistId, artist.name)}
+                    className="cursor-pointer hover:underline text-blue-600"
+                >
+                    {artist.name}
+                </span>
+            );
+        } else {
+            // B2B performance - multiple artists
+            return (
+                <span>
+                    {artists.map((artist, index) => (
+                        <span key={artist.artistId}>
+                            <span
+                                onClick={() => searchTracks(artist.artistId, artist.name)}
+                                className="cursor-pointer hover:underline text-blue-600"
+                            >
+                                {artist.name}
+                            </span>
+                            {index < artists.length - 1 && " b2b "}
+                        </span>
+                    ))}
+                </span>
+            );
+        }
+    }
+
+    // Get all performances from the lineup data
+    function getAllPerformances(): Performance[] {
+        const performances: Performance[] = [];
+        
+        // Navigate through the lineup structure: weeks -> dates -> stages -> performances
+        Object.values(lineupData).forEach((week: any) => {
+            Object.values(week).forEach((date: any) => {
+                Object.values(date).forEach((stagePerformances: any) => {
+                    performances.push(...stagePerformances);
+                });
+            });
+        });
+        
+        return performances;
+    }
+
+    const allPerformances = getAllPerformances();
+
     return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-            <p onClick={() => searchTracks("1lJhME1ZpzsEa5M0wW6Mso")} key="1lJhME1ZpzsEa5M0wW6Mso">Charlotte de Witte</p>
-            <ul>
-                {tracks.map((track) => (
-                    <li key={track.id} onClick={() => playTrack(track)}>
-                        {track.name}
-                    </li>
-                ))}
-            </ul>
+        <div>
+            <div>
+                <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
+                
+                {/* Render all artists from lineup */}
+                <div className="mb-8">
+                    <h2 className="text-xl font-semibold mb-4">Artists:</h2>
+                    <div className="space-y-2">
+                        {allPerformances.map((performance) => (
+                            <div key={performance.id} className="text-lg">
+                                {renderPerformance(performance)}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Show currently selected artist */}
+                {selectedArtist && (
+                    <div className="mb-4">
+                        <h3 className="text-lg font-medium">
+                            Top tracks for: <span className="text-blue-600">{selectedArtist}</span>
+                        </h3>
+                    </div>
+                )}
+            </div>
+
+            {/* Track list */}
+            <div>
+                {tracks.length > 0 && (
+                    <ul className="space-y-2">
+                        {tracks.map((track) => (
+                            <li 
+                                key={track.id} 
+                                onClick={() => playTrack(track)}
+                                className="cursor-pointer hover:underline text-green-600"
+                            >
+                                {track.name}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            {/* Spotify player */}
             {playingTrack && (
                 <div style={{ marginTop: "2rem" }}>
                     <iframe
