@@ -23,6 +23,9 @@ interface Artist {
 interface Performance {
     id: string;
     artists: Artist[];
+    week: string;
+    date: string;
+    stage: string;
 }
 
 export default function Home() {
@@ -64,7 +67,6 @@ export default function Home() {
             const artist = artists[0];
             return (
                 <span
-                    key={artist.artistId}
                     onClick={() => searchTracks(artist.artistId, artist.name)}
                     className="cursor-pointer hover:underline text-blue-600"
                 >
@@ -76,8 +78,9 @@ export default function Home() {
             return (
                 <span>
                     {artists.map((artist, index) => (
-                        <span key={artist.artistId}>
+                        <span key={`${performance.week}-${performance.date}-${performance.stage}-${artist.artistId}`}>
                             <span
+                                key={artist.artistId}
                                 onClick={() => searchTracks(artist.artistId, artist.name)}
                                 className="cursor-pointer hover:underline text-blue-600"
                             >
@@ -95,14 +98,37 @@ export default function Home() {
     function getAllPerformances(): Performance[] {
         const performances: Performance[] = [];
         
-        // Navigate through the lineup structure: weeks -> dates -> stages -> performances
-        Object.values(lineupData).forEach((week: any) => {
-            Object.values(week).forEach((date: any) => {
-                Object.values(date).forEach((stagePerformances: any) => {
-                    performances.push(...stagePerformances);
-                });
-            });
-        });
+        try {
+            // More robust way to handle the nested structure
+            for (const weekKey in lineupData) {
+                const week = lineupData[weekKey as keyof typeof lineupData];
+                
+                for (const dateKey in week) {
+                    const date = week[dateKey as keyof typeof week];
+                    
+                    for (const stageKey in date) {
+                        const stagePerformances = date[stageKey as keyof typeof date];
+                        
+                        if (Array.isArray(stagePerformances)) {
+                            stagePerformances.forEach((performance: any, index: number) => {
+                                // Create a unique key combining all context + index for extra safety
+                                const uniqueKey = `${weekKey}-${dateKey}-${stageKey}-${performance.id || index}`;
+                                
+                                performances.push({
+                                    ...performance,
+                                    week: weekKey,
+                                    date: dateKey,
+                                    stage: stageKey,
+                                    uniqueKey: uniqueKey
+                                });
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error processing lineup data:", error);
+        }
         
         return performances;
     }
@@ -119,7 +145,7 @@ export default function Home() {
                     <h2 className="text-xl font-semibold mb-4">Artists:</h2>
                     <div className="space-y-2">
                         {allPerformances.map((performance) => (
-                            <div key={performance.id} className="text-lg">
+                            <div key={`${performance.week}-${performance.date}-${performance.stage}-${performance.id}`} className="text-lg">
                                 {renderPerformance(performance)}
                             </div>
                         ))}
@@ -142,7 +168,7 @@ export default function Home() {
                     <ul className="space-y-2">
                         {tracks.map((track) => (
                             <li 
-                                key={track.id} 
+                                key={`${track.id}test`} 
                                 onClick={() => playTrack(track)}
                                 className="cursor-pointer hover:underline text-green-600"
                             >
