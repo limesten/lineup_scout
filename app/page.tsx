@@ -48,7 +48,6 @@ export default function Home() {
     const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-    // Helper function to get first date of a weekend
     function getFirstDateOfWeekend(weekend: string): string | null {
         const weekData = LineupData[weekend as keyof LineupData];
         if (!weekData) return null;
@@ -57,13 +56,11 @@ export default function Home() {
         return dates.length > 0 ? dates[0] : null;
     }
 
-    // Set initial date when component mounts
     useEffect(() => {
         const firstDate = getFirstDateOfWeekend(selectedWeekend);
         setSelectedDate(firstDate);
-    }, []); // Empty dependency array - only runs once on mount
+    }, []); 
 
-    // Update date when weekend changes
     useEffect(() => {
         const firstDate = getFirstDateOfWeekend(selectedWeekend);
         setSelectedDate(firstDate);
@@ -137,14 +134,14 @@ export default function Home() {
         return (
             <>
                 {Object.entries(dateData).map(([stageName, performances]) => (
-                    <Card key={stageName} className="mb-6">
+                    <Card key={stageName} className="mb-6 text-center break-inside-avoid">
                         <CardHeader>
                             <CardTitle>{stageName}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-1">
                                 {performances.map((performance) => (
-                                    <li key={performance.id}>{renderPerformance(performance)}</li>
+                                    <li key={performance.id} className="mt-2">{renderPerformance(performance)}</li>
                                 ))}
                             </ul>
                         </CardContent>
@@ -156,7 +153,7 @@ export default function Home() {
 
     return (
         <div>
-            <div>
+            <div className="container mx-auto px-4 flex flex-col items-center">
                 <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
 
                 <ToggleGroup
@@ -184,9 +181,10 @@ export default function Home() {
                     ))}
                 </ToggleGroup>
 
-                <div className="flex flex-row gap-4">
+                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
                     {selectedDate && getStagesByDate(selectedDate)}
                 </div>
+
 
                 {/* Show currently selected artist */}
                 {selectedArtist && (
@@ -196,7 +194,8 @@ export default function Home() {
                         </h3>
                     </div>
                 )}
-            </div>
+
+            </ div>
 
             {/* Track list */}
             <div>

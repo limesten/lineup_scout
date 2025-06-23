@@ -1,0 +1,187 @@
+{
+    "week_1": {
+      "2025-07-18": {
+        "MAINSTAGE": [
+          {
+            "id": "1",
+            "artists": [
+              { "name": "DJ Alpha", "artistId": "alpha001" }
+            ]
+          },
+          {
+            "id": "2",
+            "artists": [
+              { "name": "BeatFox", "artistId": "beatfox001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "3",
+            "artists": [
+              { "name": "SynthLion", "artistId": "synthlion001" }
+            ]
+          },
+          {
+            "id": "4",
+            "artists": [
+              { "name": "EchoRider", "artistId": "echorider001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-19": {
+        "MAINSTAGE": [
+          {
+            "id": "5",
+            "artists": [
+              { "name": "Neon Vibe", "artistId": "neonvibe001" }
+            ]
+          },
+          {
+            "id": "6",
+            "artists": [
+              { "name": "Bass Hunterz", "artistId": "basshunterz001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "7",
+            "artists": [
+              { "name": "CloudSurfer", "artistId": "cloudsurfer001" }
+            ]
+          },
+          {
+            "id": "8",
+            "artists": [
+              { "name": "Moon Pulse", "artistId": "moonpulse001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-20": {
+        "MAINSTAGE": [
+          {
+            "id": "9",
+            "artists": [
+              { "name": "DriftMode", "artistId": "driftmode001" }
+            ]
+          },
+          {
+            "id": "10",
+            "artists": [
+              { "name": "FireEcho", "artistId": "fireecho001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "11",
+            "artists": [
+              { "name": "Nova Quest", "artistId": "novaquest001" }
+            ]
+          },
+          {
+            "id": "12",
+            "artists": [
+              { "name": "Static Rush", "artistId": "staticrush001" }
+            ]
+          }
+        ]
+      }
+    },
+    "week_2": {
+      "2025-07-25": {
+        "MAINSTAGE": [
+          {
+            "id": "13",
+            "artists": [
+              { "name": "Galaxy Thump", "artistId": "galaxythump001" }
+            ]
+          },
+          {
+            "id": "14",
+            "artists": [
+              { "name": "Rhythmix", "artistId": "rhythmix001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "15",
+            "artists": [
+              { "name": "VibeCraft", "artistId": "vibecraft001" }
+            ]
+          },
+          {
+            "id": "16",
+            "artists": [
+              { "name": "Zeta Loop", "artistId": "zetaloop001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-26": {
+        "MAINSTAGE": [
+          {
+            "id": "17",
+            "artists": [
+              { "name": "LaserHawk", "artistId": "laserhawk001" }
+            ]
+          },
+          {
+            "id": "18",
+            "artists": [
+              { "name": "Deep Nova", "artistId": "deepnova001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "19",
+            "artists": [
+              { "name": "DreamDrip", "artistId": "dreamdrip001" }
+            ]
+          },
+          {
+            "id": "20",
+            "artists": [
+              { "name": "EchoSynth", "artistId": "echosynth001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-27": {
+        "MAINSTAGE": [
+          {
+            "id": "21",
+            "artists": [
+              { "name": "Razor Pulse", "artistId": "razorpulse001" }
+            ]
+          },
+          {
+            "id": "22",
+            "artists": [
+              { "name": "Voltage Kid", "artistId": "voltagekid001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "23",
+            "artists": [
+              { "name": "LightWaver", "artistId": "lightwaver001" }
+            ]
+          },
+          {
+            "id": "24",
+            "artists": [
+              { "name": "Aria Storm", "artistId": "ariastorm001" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
