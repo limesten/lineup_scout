@@ -1,1270 +1,187 @@
 {
-  "week_1": {
-    "2025-07-18": {
-      "MAINSTAGE": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Alok",
-              "artistId": "0NGAZxHanS9e0iNHpR8f2W"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Artbat",
-              "artistId": "66kcQDmB3WcuoYPaNQqeH7"
-            },
-            {
-              "name": "Kölsch",
-              "artistId": "2D9Oe8R9UhbMvFAsMJpXj0"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Axwell",
-              "artistId": "1xNmvlEiICkRlRGqlNFZ43"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "ANNA",
-              "artistId": "7K80yOTC0Id95gRaOxDG5u"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Martin Garrix",
-              "artistId": "60d24wfXkVzDSfLS6hyCjZ"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Meduza",
-              "artistId": "0xRXCcSX89eobfrshSVdyu"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Mike Williams",
-              "artistId": "3IpvVrP3VLhruTmnququq7"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "NERVO",
-              "artistId": "4j5KBTO4tk7up54ZirNGvK"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "Odymel",
-              "artistId": "7c4fOBUstnjfbvSwtOJSiA"
-            },
-            {
-              "name": "Pegassi",
-              "artistId": "2A4uiWrfuBpVFugyvxAt4c"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "Sub Zero Project",
-              "artistId": "4f0OXMMSxr0r8Ztx6CdpAl"
-            }
-          ]
-        },
-        {
-          "id": "11",
-          "artists": [
-            {
-              "name": "Vini Vici",
-              "artistId": "29zsVzEH33dD5QqxeL8dvy"
-            }
-          ]
-        }
-      ],
-      "FREEDOM": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Eric Prydz",
-              "artistId": "5sm0jQ1mq0dusiLtDJ2b4R"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Esin Boz",
-              "artistId": "4edQilKMzaQG7GzgAMJDbf"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "HI-LO",
-              "artistId": "0ETJQforv5OXgDgidQv9qd"
-            },
-            {
-              "name": "Eli Brown",
-              "artistId": "5lVNSw2GPci8kebrAQpZqU"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "John Summit",
-              "artistId": "7kNqXtgeIwFtelmRjWv205"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Joris Voorn",
-              "artistId": "4jGpKAmwvU263l0tUh4xKU"
-            },
-            {
-              "name": "Rose Ringed",
-              "artistId": "1KML3dPprByep3tRnYSJDj"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Layla Benitez",
-              "artistId": "3StMSo3rzsZBfuGaGLq3IE"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Rivo",
-              "artistId": "2NrprO4CludRmaWtpqud10"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Semsei",
-              "artistId": "1EUy8CQML3mA5WF7v7H9fg"
-            }
-          ]
-        }
-      ],
-      "THE ROSE GARDEN": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "1991",
-              "artistId": "2IP71LH7CbwddhsEXBI0fy"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Andromedik",
-              "artistId": "7miXLG9boDOGHJaEelSL7T"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Camo & Krooked",
-              "artistId": "2N8IPNZTiNo3nj4mreOlHU"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Emily Makis",
-              "artistId": "51ferxocEKt0vjxzUsqyFX"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Idle Days",
-              "artistId": "6wx2DYiNYOG3HGQYQSBb9j"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "IVY",
-              "artistId": "2NCEtX40i9lLNpTg2X5583"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Metrik",
-              "artistId": "2NCEtX40i9lLNpTg2X5583"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Pirapus",
-              "artistId": "7KgEOoJ0CawH7NOaLe34Qe"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "Primate",
-              "artistId": "37C3qTCakuZc3EjTari9lU"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "Sennix",
-              "artistId": "41HvfFJcU7Ij641TiP3hZL"
-            }
-          ]
-        },
-        {
-          "id": "11",
-          "artists": [
-            {
-              "name": "Sota",
-              "artistId": "6ePZyisYTEtSze2cCNS2Kb"
-            },
-            {
-              "name": "Basstripper",
-              "artistId": "1tSiIyp5dxfbEaS0nZGMEl"
-            }
-          ]
-        },
-        {
-          "id": "12",
-          "artists": [
-            {
-              "name": "T & Sugah",
-              "artistId": "6jsS2mOTAxVrlSUWiPLXpH"
-            }
-          ]
-        }
-      ],
-      "ELIXIR": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Annabel Stop It",
-              "artistId": "5gBb4inMl5EJFcQxEWpQJ7"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Belgianly Made",
-              "artistId": "0RF3teBjUzbf1SDpnuR8Ro"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "C-Track",
-              "artistId": "7i2c7GB766bUWAiBN6yHuZ"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Cromanty Sound",
-              "artistId": "05vcu9lox3COSrjc4QpjAp"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Double D",
-              "artistId": "4xkDuKUkDST3ESliFCdcDy"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Flavour Drop",
-              "artistId": "3PtEOX0PJSh7ndOL4tP0NR"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Flo Windey ft. Skyve",
-              "artistId": "0s4kXsjYeH0S1xRyVGN4NO"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Hunter",
-              "artistId": "1nQp0Yk9yxk2PJsXOtMR14"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "MC Rim",
-              "artistId": "1mvpEXClANunyiHFtAXCxt"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "Soul Shakers",
-              "artistId": "5UlVl2ITJDRAPGazD4KPHD"
-            }
-          ]
-        },
-        {
-          "id": "11",
-          "artists": [
-            {
-              "name": "Walshy Fire",
-              "artistId": "3yJLZoq3Ra2VmSW5teVgih"
-            }
-          ]
-        }
-      ],
-      "THE RAVE CAVE": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Ben Malone",
-              "artistId": "2zOgqOWn43vcjNdEnxsC6f"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Horizontal Soundsystem",
-              "artistId": "38KJOj7CCAHBDSLkjczak1"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Kriss Reeve",
-              "artistId": "5oS267l8pGKqJmh9ZhCYGS"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Lou8",
-              "artistId": "0mYKwruCTVBSCYum9vqH2G"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Luca v/d Hombergh",
-              "artistId": "4qe6SfEaJUAm0CF2oyFdcd"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "NOME.",
-              "artistId": "0k52cXAjNIDjZOE1WDEV93"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "The Rocketman",
-              "artistId": "6ArtT03Hv9H55Y3EVa7d2V"
-            }
-          ]
-        }
-      ],
-      "CAGE": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Dr Donk",
-              "artistId": "0NirwTOv2qvuXsNNZkDPNu"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "DRS",
-              "artistId": "3ipAwQsSahvSht3Bb8SpLs"
-            },
-            {
-              "name": "Sandy Warez",
-              "artistId": "1oZ7OpE1SHjyUjXgYKaLpM"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Pinotello",
-              "artistId": "1WjmW8uqn4LwwsJxrDMM4d"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Revedge",
-              "artistId": "6moKF8sK7CQa4hQBizhGgE"
-            },
-            {
-              "name": "Bazzy",
-              "artistId": "2hmSK2PF6NCpkgZX1wFB1N"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Sacha Malice",
-              "artistId": "6euKmkEgioqFIWf8hiqlDs"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Sakyra",
-              "artistId": "2GR3DT7wsxRnjNckRcNMpD"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Spitnoise",
-              "artistId": "29kB8Ku9QQNmrl3yZw6Xxl"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Suttlek",
-              "artistId": "6Sz5mHLTshoYjvKtSjWTgd"
-            },
-            {
-              "name": "Revenja",
-              "artistId": "0h5qBrEqJKcWW80Q1yS3ih"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "The Dark Horror",
-              "artistId": "3e7LfI39pUL22PeGn1mlFa"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "Toxic Twins",
-              "artistId": "5SjcCxK1ncJftsOQVKVadC"
-            },
-            {
-              "name": "NRKi",
-              "artistId": "1t8yas984NoFDReRcOpI3n"
-            }
-          ]
-        },
-        {
-          "id": "11",
-          "artists": [
-            {
-              "name": "Unicorn On K",
-              "artistId": "3NoAERCAeMG0EOGpbpdYLm"
-            }
-          ]
-        }
-      ],
-      "RISE BY COCA-COLA": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Bastin",
-              "artistId": "4SOT7IYJSz33NiCZtRiMqg"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Christophe & Seelen",
-              "artistId": "50qKwxSeIimQfHK7aCHZP6"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Disco Dasco",
-              "artistId": "1wHBOlgz3JKnVrFb50wu35"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "More to be announced",
-              "artistId": "1RcdQzrsD7kUquJGSJdPAn"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Rafi Khan",
-              "artistId": "2E9FsJ2mEIQ8kfOxuexTBO"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Roma",
-              "artistId": "5GT8ltnqVPe7Zf8Ynrb5mV"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Romy Janssen",
-              "artistId": "5wizmv8KVwvSrcFyvagn8x"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Vinnie",
-              "artistId": "3rExe3A3FzAmYDlQuvW2Wx"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "Yves Deruyter",
-              "artistId": "0jKR1DdWGSZB2hYgJq82qt"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "ZT Music",
-              "artistId": "1RgbNbnc86Ks5Pg2p5pyUI"
-            }
-          ]
-        }
-      ],
-      "PLANAXIS": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Anii",
-              "artistId": "2ee4oku9KsfpE5buQ0kxx2"
-            },
-            {
-              "name": "Axel Haube",
-              "artistId": "750ED9zAnM0KrRgcPpe4r4"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Arten",
-              "artistId": "1VQI2S2gOS6B5tqzoMwXhO"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Brina Knauss",
-              "artistId": "3dAC3NjJnsavHLFC8GCyRZ"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "ELIF",
-              "artistId": "65AzRSW0jKSs0WtttEXrOw"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Innellea",
-              "artistId": "71rqI5HtraA3qXBwatyG6e"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Laura Hoogland",
-              "artistId": "2zd9YxlsQvA5mkZ1NarYVQ"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Stephan Bodzin",
-              "artistId": "2nq2BeSbzExGAv3Y4HgUf7"
-            }
-          ]
-        }
-      ],
-      "ATMOSPHERE": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Azyr",
-              "artistId": "0d1yySJPj381HqS3rlRvi3"
-            },
-            {
-              "name": "Nico Moreno",
-              "artistId": "6fjhNhp9IoeiZpEXq9AT2S"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Emilija",
-              "artistId": "5Yg2ZMGPDP0QLT5KPtBrkB"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Fantasm",
-              "artistId": "0copVQkrcbfv5CzOyXuLKy"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Faster horses",
-              "artistId": "3LpHT7su9Y4DLfV6NCfZKZ"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Hannah Laing",
-              "artistId": "1QEd635szhierW6gzRiS1o"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Holy Priest",
-              "artistId": "5UG2ipdnA4vk8Eevkf1s06"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Hurts",
-              "artistId": "3w4VAlllkAWI6m0AV0Gn6a"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "NOVAH",
-              "artistId": "7qvjUtp2ccRD9AiDnukyFF"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "VIDO",
-              "artistId": "28DVBoEuAN6d6D6u83v2JP"
-            },
-            {
-              "name": "BYØRN",
-              "artistId": "6PNduxfJ9CVW1bVXUR16AD"
-            }
-          ]
-        }
-      ],
-      "CRYSTAL GARDEN": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "ANNA",
-              "artistId": "7K80yOTC0Id95gRaOxDG5u"
-            },
-            {
-              "name": "Antdot",
-              "artistId": "3of9b8iUxyXtfnwwahfUNx"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Arodes",
-              "artistId": "4p2f8wUtltMAFuIJB4NR47"
-            },
-            {
-              "name": "Shimza",
-              "artistId": "0WHbjg8hVel1R9kq5794HX"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Austin Millz",
-              "artistId": "43UmVQp9qZILibJ5vHq21k"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Eridu",
-              "artistId": "7ik54S0zXk1Ex5xSU8Igmf"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Franc Fala",
-              "artistId": "0FSasrFTs0AQBrJkcFE6vB"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Vintage Culture",
-              "artistId": "28uJnu5EsrGml2tBd7y8ts"
-            }
-          ]
-        }
-      ],
-      "CORE": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Bora Uzer",
-              "artistId": "71WhzQzCSYszOnrfCEbZge"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Damian Lazarus",
-              "artistId": "3EIJ8wiUHbgkRCt5cpRrQv"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Jennifer Cardini",
-              "artistId": "3AN049igIAaoX0fjTCkpnf"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Laura Meester",
-              "artistId": "7mj5xXWTY7waS2qPkjnWpx"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Parallelle",
-              "artistId": "4j2NOrZwtpyVrtrCXsKsag"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Toolate Groove",
-              "artistId": "2ztp3GKsaGp6ZWLzs12OEN"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Tripolism",
-              "artistId": "18JlbX3l0yzlwdnQVJrLsp"
-            }
-          ]
-        }
-      ],
-      "MOOSEBAR": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "DJ Prosit",
-              "artistId": "1sfj0hfLTg5FXQUcaVzgmb"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Kurt Verheyen",
-              "artistId": "6DS4HTT93AtHE9vH2zpYJ4"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Tom Cosyns",
-              "artistId": "2Zi54WZaWx3bTV977zwvdE"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Yves Segers",
-              "artistId": "40OsiHycg1k81f7QjE54CM"
-            }
-          ]
-        }
-      ],
-      "MELODIA BY CORONA": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Aaron Sevilla",
-              "artistId": "2lbgi5Ssxb8kmw66GsFEYX"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Alure",
-              "artistId": "2at01aWUeF5RX0bm7M7LjP"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Arado",
-              "artistId": "0Ge6ITnrgvMq4duc4GuTqA"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "B'Elle",
-              "artistId": "3Bp4EXpyHUtJn0HNOk7RVz"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Block & Crown",
-              "artistId": "5jO3o2nsu0GTQBc8Lgcna7"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "James de Torres",
-              "artistId": "3V2xA860a9cLBlJEpVbgsP"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Joezi",
-              "artistId": "2mC93i8OOfK2jpFERbVv8B"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Lotte Feyen",
-              "artistId": "7FNUabLW5TSZwDmuz2jiqL"
-            }
-          ]
-        }
-      ],
-      "THE GREAT LIBRARY": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Dillon Francis",
-              "artistId": "5R3Hr2cnCCjt220Jmt2xLf"
-            },
-            {
-              "name": "Marten Hørger",
-              "artistId": "0EdUwJSqkMmsH6Agg3G8Ls"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Hardwell",
-              "artistId": "6BrvowZBreEkXzJQMpL174"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "Jaden Bojsen",
-              "artistId": "1eUSEIGd3eCEUOeLFgJACg"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "John Newman",
-              "artistId": "34v5MVKeQnIo0CWYMbbrPf"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Juicy M",
-              "artistId": "6klooWKc13AOY1BVfE0Tm6"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "MagiK",
-              "artistId": "4lHCGfS7hfmctzOHRZ4TZh"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "MANDY",
-              "artistId": "59VlEky6rgwrcluurlvspE"
-            }
-          ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "Manuals",
-              "artistId": "5bvEoXzMCyh9cuwQu0Tvvo"
-            }
-          ]
-        },
-        {
-          "id": "9",
-          "artists": [
-            {
-              "name": "Matisse & Sadko",
-              "artistId": "2QMCcKIPHnjQaPPgoEst88"
-            },
-            {
-              "name": "Third Party",
-              "artistId": "2J80qXI4NHKpq5RT3xUF7V"
-            }
-          ]
-        },
-        {
-          "id": "10",
-          "artists": [
-            {
-              "name": "Oliver Heldens",
-              "artistId": "5nki7yRhxgM509M5ADlN1p"
-            }
-          ]
-        },
-        {
-          "id": "11",
-          "artists": [
-            {
-              "name": "Pat Krimson",
-              "artistId": "5eM988kictwqIzMU1Y72tF"
-            }
-          ]
-        },
-        {
-          "id": "12",
-          "artists": [
-            {
-              "name": "R3hab",
-              "artistId": "6cEuCEZu7PAE9ZSzLLc2oQ"
-            }
-          ]
-        }
-      ],
-      "HOUSE OF FORTUNE BY JBL": [
-        {
-          "id": "1",
-          "artists": [
-            {
-              "name": "Broz",
-              "artistId": "7DUB7Vg76jw7nHZN4E8RSn"
-            }
-          ]
-        },
-        {
-          "id": "2",
-          "artists": [
-            {
-              "name": "Cence Brothers",
-              "artistId": "4b1EkZicl5EXAHYZMY4uQC"
-            }
-          ]
-        },
-        {
-          "id": "3",
-          "artists": [
-            {
-              "name": "J8man",
-              "artistId": "4Rn62JaiQyUSNKrFpC6GzW"
-            }
-          ]
-        },
-        {
-          "id": "4",
-          "artists": [
-            {
-              "name": "Jaden Bojsen",
-              "artistId": "1eUSEIGd3eCEUOeLFgJACg"
-            }
-          ]
-        },
-        {
-          "id": "5",
-          "artists": [
-            {
-              "name": "Junkie Kid",
-              "artistId": "3CjPghA9sowRwFGSrU038J"
-            }
-          ]
-        },
-        {
-          "id": "6",
-          "artists": [
-            {
-              "name": "Little D",
-              "artistId": "7ov9CbKGFjp56rSfH3XhZ0"
-            }
-          ]
-        },
-        {
-          "id": "7",
-          "artists": [
-            {
-              "name": "Makasi",
-              "artistId": "6eV9xjvttxeYB2iST5hfT6"
-            }
-          ]
-        }
-      ]
+    "week_1": {
+      "2025-07-18": {
+        "MAINSTAGE": [
+          {
+            "id": "1",
+            "artists": [
+              { "name": "DJ Alpha", "artistId": "alpha001" }
+            ]
+          },
+          {
+            "id": "2",
+            "artists": [
+              { "name": "BeatFox", "artistId": "beatfox001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "3",
+            "artists": [
+              { "name": "SynthLion", "artistId": "synthlion001" }
+            ]
+          },
+          {
+            "id": "4",
+            "artists": [
+              { "name": "EchoRider", "artistId": "echorider001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-19": {
+        "MAINSTAGE": [
+          {
+            "id": "5",
+            "artists": [
+              { "name": "Neon Vibe", "artistId": "neonvibe001" }
+            ]
+          },
+          {
+            "id": "6",
+            "artists": [
+              { "name": "Bass Hunterz", "artistId": "basshunterz001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "7",
+            "artists": [
+              { "name": "CloudSurfer", "artistId": "cloudsurfer001" }
+            ]
+          },
+          {
+            "id": "8",
+            "artists": [
+              { "name": "Moon Pulse", "artistId": "moonpulse001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-20": {
+        "MAINSTAGE": [
+          {
+            "id": "9",
+            "artists": [
+              { "name": "DriftMode", "artistId": "driftmode001" }
+            ]
+          },
+          {
+            "id": "10",
+            "artists": [
+              { "name": "FireEcho", "artistId": "fireecho001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "11",
+            "artists": [
+              { "name": "Nova Quest", "artistId": "novaquest001" }
+            ]
+          },
+          {
+            "id": "12",
+            "artists": [
+              { "name": "Static Rush", "artistId": "staticrush001" }
+            ]
+          }
+        ]
+      }
+    },
+    "week_2": {
+      "2025-07-25": {
+        "MAINSTAGE": [
+          {
+            "id": "13",
+            "artists": [
+              { "name": "Galaxy Thump", "artistId": "galaxythump001" }
+            ]
+          },
+          {
+            "id": "14",
+            "artists": [
+              { "name": "Rhythmix", "artistId": "rhythmix001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "15",
+            "artists": [
+              { "name": "VibeCraft", "artistId": "vibecraft001" }
+            ]
+          },
+          {
+            "id": "16",
+            "artists": [
+              { "name": "Zeta Loop", "artistId": "zetaloop001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-26": {
+        "MAINSTAGE": [
+          {
+            "id": "17",
+            "artists": [
+              { "name": "LaserHawk", "artistId": "laserhawk001" }
+            ]
+          },
+          {
+            "id": "18",
+            "artists": [
+              { "name": "Deep Nova", "artistId": "deepnova001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "19",
+            "artists": [
+              { "name": "DreamDrip", "artistId": "dreamdrip001" }
+            ]
+          },
+          {
+            "id": "20",
+            "artists": [
+              { "name": "EchoSynth", "artistId": "echosynth001" }
+            ]
+          }
+        ]
+      },
+      "2025-07-27": {
+        "MAINSTAGE": [
+          {
+            "id": "21",
+            "artists": [
+              { "name": "Razor Pulse", "artistId": "razorpulse001" }
+            ]
+          },
+          {
+            "id": "22",
+            "artists": [
+              { "name": "Voltage Kid", "artistId": "voltagekid001" }
+            ]
+          }
+        ],
+        "FREEDOM": [
+          {
+            "id": "23",
+            "artists": [
+              { "name": "LightWaver", "artistId": "lightwaver001" }
+            ]
+          },
+          {
+            "id": "24",
+            "artists": [
+              { "name": "Aria Storm", "artistId": "ariastorm001" }
+            ]
+          }
+        ]
+      }
     }
   }
-}
+  

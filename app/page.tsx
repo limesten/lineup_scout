@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import lineupData from "@/lib/lineup.json";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const LineupData: LineupData = lineupData;
 
 interface Track {
     id: string;
@@ -23,30 +27,59 @@ interface Artist {
 interface Performance {
     id: string;
     artists: Artist[];
-    week: string;
-    date: string;
-    stage: string;
+}
+
+interface StagePerformances {
+    [stageName: string]: Performance[];
+}
+
+interface DatePerformances {
+    [date: string]: StagePerformances;
+}
+
+interface LineupData {
+    [weekKey: string]: DatePerformances;
 }
 
 export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
     const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
+    const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+    // Helper function to get first date of a weekend
+    function getFirstDateOfWeekend(weekend: string): string | null {
+        const weekData = LineupData[weekend as keyof LineupData];
+        if (!weekData) return null;
+
+        const dates = Object.keys(weekData);
+        return dates.length > 0 ? dates[0] : null;
+    }
+
+    // Set initial date when component mounts
+    useEffect(() => {
+        const firstDate = getFirstDateOfWeekend(selectedWeekend);
+        setSelectedDate(firstDate);
+    }, []); // Empty dependency array - only runs once on mount
+
+    // Update date when weekend changes
+    useEffect(() => {
+        const firstDate = getFirstDateOfWeekend(selectedWeekend);
+        setSelectedDate(firstDate);
+    }, [selectedWeekend]);
 
     async function searchTracks(artistId: string, artistName: string) {
         setSelectedArtist(artistName);
-             
+
         try {
-            const response = await fetch(
-                `/api/spotify-search?artistId=${artistId}`
-            );
-            
+            const response = await fetch(`/api/spotify-search?artistId=${artistId}`);
+
             if (!response.ok) {
                 console.log("Error fetching tracks");
                 return;
             }
-            
+
             const data = await response.json();
             setTracks(data.tracks || []);
             setPlayingTrack(null);
@@ -61,14 +94,14 @@ export default function Home() {
 
     function renderPerformance(performance: Performance) {
         const { artists } = performance;
-        
+
         if (artists.length === 1) {
             // Single artist performance
             const artist = artists[0];
             return (
                 <span
                     onClick={() => searchTracks(artist.artistId, artist.name)}
-                    className="cursor-pointer hover:underline text-blue-600"
+                    className="cursor-pointer"
                 >
                     {artist.name}
                 </span>
@@ -78,11 +111,11 @@ export default function Home() {
             return (
                 <span>
                     {artists.map((artist, index) => (
-                        <span key={`${performance.week}-${performance.date}-${performance.stage}-${artist.artistId}`}>
+                        <span key={`${artist.artistId}`}>
                             <span
                                 key={artist.artistId}
                                 onClick={() => searchTracks(artist.artistId, artist.name)}
-                                className="cursor-pointer hover:underline text-blue-600"
+                                className="cursor-pointer"
                             >
                                 {artist.name}
                             </span>
@@ -94,62 +127,65 @@ export default function Home() {
         }
     }
 
-    // Get all performances from the lineup data
-    function getAllPerformances(): Performance[] {
-        const performances: Performance[] = [];
-        
-        try {
-            // More robust way to handle the nested structure
-            for (const weekKey in lineupData) {
-                const week = lineupData[weekKey as keyof typeof lineupData];
-                
-                for (const dateKey in week) {
-                    const date = week[dateKey as keyof typeof week];
-                    
-                    for (const stageKey in date) {
-                        const stagePerformances = date[stageKey as keyof typeof date];
-                        
-                        if (Array.isArray(stagePerformances)) {
-                            stagePerformances.forEach((performance: any, index: number) => {
-                                // Create a unique key combining all context + index for extra safety
-                                const uniqueKey = `${weekKey}-${dateKey}-${stageKey}-${performance.id || index}`;
-                                
-                                performances.push({
-                                    ...performance,
-                                    week: weekKey,
-                                    date: dateKey,
-                                    stage: stageKey,
-                                    uniqueKey: uniqueKey
-                                });
-                            });
-                        }
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error processing lineup data:", error);
-        }
-        
-        return performances;
-    }
+    function getStagesByDate(date: string) {
+        const dateData = LineupData[selectedWeekend][date];
 
-    const allPerformances = getAllPerformances();
+        if (!dateData) {
+            return null;
+        }
+
+        return (
+            <>
+                {Object.entries(dateData).map(([stageName, performances]) => (
+                    <Card key={stageName} className="mb-6">
+                        <CardHeader>
+                            <CardTitle>{stageName}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-1">
+                                {performances.map((performance) => (
+                                    <li key={performance.id}>{renderPerformance(performance)}</li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                ))}
+            </>
+        );
+    }
 
     return (
         <div>
             <div>
                 <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
-                
-                {/* Render all artists from lineup */}
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold mb-4">Artists:</h2>
-                    <div className="space-y-2">
-                        {allPerformances.map((performance) => (
-                            <div key={`${performance.week}-${performance.date}-${performance.stage}-${performance.id}`} className="text-lg">
-                                {renderPerformance(performance)}
-                            </div>
-                        ))}
-                    </div>
+
+                <ToggleGroup
+                    type="single"
+                    value={selectedWeekend}
+                    onValueChange={setSelectedWeekend}
+                >
+                    <ToggleGroupItem variant="outline" value="week_1">
+                        Weekend 1
+                    </ToggleGroupItem>
+                    <ToggleGroupItem variant="outline" value="week_2">
+                        Weekend 2
+                    </ToggleGroupItem>
+                </ToggleGroup>
+
+                <ToggleGroup
+                    type="single"
+                    value={selectedDate || ""}
+                    onValueChange={setSelectedDate}
+                >
+                    {Object.keys(LineupData[selectedWeekend]).map((date) => (
+                        <ToggleGroupItem key={date} variant="outline" value={date}>
+                            {date}
+                        </ToggleGroupItem>
+                    ))}
+                </ToggleGroup>
+
+                <div className="flex flex-row gap-4">
+                    {selectedDate && getStagesByDate(selectedDate)}
                 </div>
 
                 {/* Show currently selected artist */}
@@ -167,8 +203,8 @@ export default function Home() {
                 {tracks.length > 0 && (
                     <ul className="space-y-2">
                         {tracks.map((track) => (
-                            <li 
-                                key={`${track.id}test`} 
+                            <li
+                                key={`${track.id}test`}
                                 onClick={() => playTrack(track)}
                                 className="cursor-pointer hover:underline text-green-600"
                             >
