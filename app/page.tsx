@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import lineupData from "@/lib/lineup.json";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const LineupData: LineupData = lineupData;
 
@@ -47,6 +48,8 @@ export default function Home() {
     const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
     const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+    const [popoverArtist, setPopoverArtist] = useState<string | null>(null);
 
     function getFirstDateOfWeekend(weekend: string): string | null {
         const weekData = LineupData[weekend as keyof LineupData];
@@ -59,7 +62,7 @@ export default function Home() {
     useEffect(() => {
         const firstDate = getFirstDateOfWeekend(selectedWeekend);
         setSelectedDate(firstDate);
-    }, []); 
+    }, []);
 
     useEffect(() => {
         const firstDate = getFirstDateOfWeekend(selectedWeekend);
@@ -68,6 +71,8 @@ export default function Home() {
 
     async function searchTracks(artistId: string, artistName: string) {
         setSelectedArtist(artistName);
+        setPopoverArtist(artistName);
+        setIsPopoverOpen(true);
 
         try {
             const response = await fetch(`/api/spotify-search?artistId=${artistId}`);
@@ -96,12 +101,34 @@ export default function Home() {
             // Single artist performance
             const artist = artists[0];
             return (
-                <span
-                    onClick={() => searchTracks(artist.artistId, artist.name)}
-                    className="cursor-pointer"
+                <Popover
+                    open={isPopoverOpen && popoverArtist === artist.name}
+                    onOpenChange={setIsPopoverOpen}
                 >
-                    {artist.name}
-                </span>
+                    <PopoverTrigger>
+                        <span
+                            onClick={() => searchTracks(artist.artistId, artist.name)}
+                            className="cursor-pointer"
+                        >
+                            {artist.name}
+                        </span>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        {tracks.length > 0 && (
+                            <ul className="space-y-2">
+                                {tracks.map((track) => (
+                                    <li
+                                        key={`${track.id}test`}
+                                        onClick={() => playTrack(track)}
+                                        className="cursor-pointer"
+                                    >
+                                        {track.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </PopoverContent>
+                </Popover>
             );
         } else {
             // B2B performance - multiple artists
@@ -109,13 +136,35 @@ export default function Home() {
                 <span>
                     {artists.map((artist, index) => (
                         <span key={`${artist.artistId}`}>
-                            <span
-                                key={artist.artistId}
-                                onClick={() => searchTracks(artist.artistId, artist.name)}
-                                className="cursor-pointer"
+                            <Popover
+                                open={isPopoverOpen && popoverArtist === artist.name}
+                                onOpenChange={setIsPopoverOpen}
                             >
-                                {artist.name}
-                            </span>
+                                <PopoverTrigger asChild>
+                                    <span
+                                        key={artist.artistId}
+                                        onClick={() => searchTracks(artist.artistId, artist.name)}
+                                        className="cursor-pointer"
+                                    >
+                                        {artist.name}
+                                    </span>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    {tracks.length > 0 && (
+                                        <ul className="space-y-2">
+                                            {tracks.map((track) => (
+                                                <li
+                                                    key={`${track.id}test`}
+                                                    onClick={() => playTrack(track)}
+                                                    className="cursor-pointer"
+                                                >
+                                                    {track.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </PopoverContent>
+                            </Popover>
                             {index < artists.length - 1 && " b2b "}
                         </span>
                     ))}
@@ -141,7 +190,9 @@ export default function Home() {
                         <CardContent>
                             <ul className="space-y-1">
                                 {performances.map((performance) => (
-                                    <li key={performance.id} className="mt-2">{renderPerformance(performance)}</li>
+                                    <li key={performance.id} className="mt-2">
+                                        {renderPerformance(performance)}
+                                    </li>
                                 ))}
                             </ul>
                         </CardContent>
@@ -181,37 +232,9 @@ export default function Home() {
                     ))}
                 </ToggleGroup>
 
-                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-full">
+                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-[80%]">
                     {selectedDate && getStagesByDate(selectedDate)}
                 </div>
-
-
-                {/* Show currently selected artist */}
-                {selectedArtist && (
-                    <div className="mb-4">
-                        <h3 className="text-lg font-medium">
-                            Top tracks for: <span className="text-blue-600">{selectedArtist}</span>
-                        </h3>
-                    </div>
-                )}
-
-            </ div>
-
-            {/* Track list */}
-            <div>
-                {tracks.length > 0 && (
-                    <ul className="space-y-2">
-                        {tracks.map((track) => (
-                            <li
-                                key={`${track.id}test`}
-                                onClick={() => playTrack(track)}
-                                className="cursor-pointer hover:underline text-green-600"
-                            >
-                                {track.name}
-                            </li>
-                        ))}
-                    </ul>
-                )}
             </div>
 
             {/* Spotify player */}
