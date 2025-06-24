@@ -181,7 +181,7 @@ export default function Home() {
                     ))}
                 </ToggleGroup>
 
-                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
+                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-full">
                     {selectedDate && getStagesByDate(selectedDate)}
                 </div>
 
