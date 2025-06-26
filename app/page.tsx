@@ -5,6 +5,7 @@ import lineupData from "@/lib/lineup.json";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LineupData: LineupData = lineupData;
 
@@ -50,6 +51,7 @@ export default function Home() {
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
     const [popoverArtist, setPopoverArtist] = useState<string | null>(null);
+    const [loadingIFrame, setLoadingIFrame] = useState<boolean>(false);
 
     function getFirstDateOfWeekend(weekend: string): string | null {
         const weekData = LineupData[weekend as keyof LineupData];
@@ -83,7 +85,7 @@ export default function Home() {
             }
 
             const data = await response.json();
-            setTracks(data.tracks || []);
+            setTracks((data.tracks || []).slice(0, 5));
             setPlayingTrack(null);
         } catch (err) {
             console.error("Error searching tracks:", err);
@@ -91,7 +93,17 @@ export default function Home() {
     }
 
     function playTrack(track: Track) {
+        setLoadingIFrame(true);
         setPlayingTrack(track);
+
+        setTimeout(() => {
+            setLoadingIFrame(false);
+        }, 1000);
+    }
+
+    function handleIFrameLoad() {
+        console.log("IFrame loaded");
+        setLoadingIFrame(false);
     }
 
     function renderPerformance(performance: Performance) {
@@ -113,7 +125,7 @@ export default function Home() {
                             {artist.name}
                         </span>
                     </PopoverTrigger>
-                    <PopoverContent>
+                    <PopoverContent className="w-sm">
                         {tracks.length > 0 && (
                             <ul className="space-y-2">
                                 {tracks.map((track) => (
@@ -122,9 +134,37 @@ export default function Home() {
                                         onClick={() => playTrack(track)}
                                         className="cursor-pointer"
                                     >
-                                        {track.name}
+                                        {track.name} -{" "}
+                                        {track.artists.map((artist) => artist.name).join(", ")}
                                     </li>
                                 ))}
+                                <div className="mt-3">
+                                    {/* Spotify player inside popover */}
+                                    {playingTrack ? (
+                                        loadingIFrame ? (
+                                            <Skeleton className="h-[80px] w-full rounded" />
+                                        ) : (
+                                            <iframe
+                                                src={`https://open.spotify.com/embed/track/${playingTrack.id}?utm_source=generator&theme=0`}
+                                                width="100%"
+                                                height="80"
+                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                loading="lazy"
+                                                className="rounded"
+                                                onLoad={() => handleIFrameLoad()}
+                                                
+                                            />
+                                        )
+                                    ) : (
+                                        <Card className="h-[80px] py-0">
+                                            <CardContent className="h-full flex items-center justify-center p-0">
+                                                <p className="text-muted-foreground text-sm">
+                                                    Click a song to play it
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+                                </div>
                             </ul>
                         )}
                     </PopoverContent>
@@ -149,7 +189,7 @@ export default function Home() {
                                         {artist.name}
                                     </span>
                                 </PopoverTrigger>
-                                <PopoverContent>
+                                <PopoverContent className="w-sm">
                                     {tracks.length > 0 && (
                                         <ul className="space-y-2">
                                             {tracks.map((track) => (
@@ -163,6 +203,27 @@ export default function Home() {
                                             ))}
                                         </ul>
                                     )}
+                                    <div className="mt-3">
+                                        {/* Spotify player inside popover */}
+                                        {playingTrack ? (
+                                            <iframe
+                                                src={`https://open.spotify.com/embed/track/${playingTrack.id}?utm_source=generator&theme=0`}
+                                                width="100%"
+                                                height="80"
+                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                loading="lazy"
+                                                className="rounded"
+                                            />
+                                        ) : (
+                                            <Card className="h-[80px] py-0">
+                                                <CardContent className="h-full flex items-center justify-center p-0">
+                                                    <p className="text-muted-foreground text-sm">
+                                                        Click a song to play it
+                                                    </p>
+                                                </CardContent>
+                                            </Card>
+                                        )}
+                                    </div>
                                 </PopoverContent>
                             </Popover>
                             {index < artists.length - 1 && " b2b "}
@@ -236,19 +297,6 @@ export default function Home() {
                     {selectedDate && getStagesByDate(selectedDate)}
                 </div>
             </div>
-
-            {/* Spotify player */}
-            {playingTrack && (
-                <div style={{ marginTop: "2rem" }}>
-                    <iframe
-                        src={`https://open.spotify.com/embed/track/${playingTrack.id}?utm_source=generator&theme=0`}
-                        width="320"
-                        height="152"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                    />
-                </div>
-            )}
         </div>
     );
 }
