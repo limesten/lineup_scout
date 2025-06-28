@@ -138,6 +138,11 @@ export default function Home() {
         };
     }, [playerLoaded, iFrameAPI, uri]);
 
+    useEffect(() => {
+        const firstDate = getFirstDateOfWeekend(selectedWeekend);
+        setSelectedDate(firstDate);
+    }, [selectedWeekend]);
+
     // Handle track changes
     useEffect(() => {
         if (spotifyEmbedControllerRef.current) {
@@ -149,18 +154,6 @@ export default function Home() {
         }
     }, [currentTrack]);
 
-    const handlePlayPause = () => {
-        if (!spotifyEmbedControllerRef.current) return;
-
-        if (isPlaying) {
-            spotifyEmbedControllerRef.current.pause();
-            setIsPlaying(false);
-        } else {
-            spotifyEmbedControllerRef.current.play();
-            setIsPlaying(true);
-        }
-    };
-
     function getFirstDateOfWeekend(weekend: string): string | null {
         const weekData = LineupData[weekend as keyof LineupData];
         if (!weekData) return null;
@@ -168,16 +161,6 @@ export default function Home() {
         const dates = Object.keys(weekData);
         return dates.length > 0 ? dates[0] : null;
     }
-
-    useEffect(() => {
-        const firstDate = getFirstDateOfWeekend(selectedWeekend);
-        setSelectedDate(firstDate);
-    }, []);
-
-    useEffect(() => {
-        const firstDate = getFirstDateOfWeekend(selectedWeekend);
-        setSelectedDate(firstDate);
-    }, [selectedWeekend]);
 
     async function searchTracks(artistId: string, artistName: string) {
         setPopoverArtist(artistName);
@@ -205,161 +188,106 @@ export default function Home() {
         setCurrentTrack(track);
     }
 
-    function renderPerformance(performance: Performance) {
+    const handlePlayPause = () => {
+        if (!spotifyEmbedControllerRef.current) return;
+
+        if (isPlaying) {
+            spotifyEmbedControllerRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            spotifyEmbedControllerRef.current.play();
+            setIsPlaying(true);
+        }
+    };
+
+    function handleTrackClick(track: Track) {
+        if (currentTrack?.id === track.id) {
+            handlePlayPause();
+        } else {
+            playTrack(track);
+        }
+    }
+
+    function TrackList(tracks: Track[]) {
+        return (
+            <ul className="space-y-1">
+                {tracks.map((track) => (
+                    <li
+                        key={track.id} // Add missing key
+                        onClick={() => handleTrackClick(track)}
+                        className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
+                    >
+                        <div className="flex items-center gap-2">
+                            {/* Album image */}
+                            {track.album.images.length > 0 && (
+                                <img
+                                    src={track.album.images[track.album.images.length - 1].url}
+                                    alt={track.album.name}
+                                    className="w-8 h-8 rounded-sm object-cover flex-shrink-0"
+                                />
+                            )}
+
+                            {/* Track info - clickable area */}
+                            <div className="min-w-0 flex-1 cursor-pointer">
+                                <p className="font-medium text-sm truncate">{track.name}</p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {track.artists.map((artist) => artist.name).join(", ")}
+                                </p>
+                            </div>
+
+                            {currentTrack?.id === track.id && isPlaying ? "⏸️" : "▶️"}
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    function Performance(performance: Performance) {
         const { artists } = performance;
 
-        if (artists.length === 1) {
-            // Single artist performance
-            const artist = artists[0];
-            return (
-                <Popover
-                    open={isPopoverOpen && popoverArtist === artist.name}
-                    onOpenChange={setIsPopoverOpen}
-                >
-                    <PopoverTrigger>
-                        <span
-                            onClick={() => searchTracks(artist.artistId, artist.name)}
-                            className="cursor-pointer hover:text-primary transition-colors"
+        return (
+            <span>
+                {artists.map((artist, index) => (
+                    <span key={artist.artistId}>
+                        <Popover
+                            open={isPopoverOpen && popoverArtist === artist.name}
+                            onOpenChange={setIsPopoverOpen}
                         >
-                            {artist.name}
-                        </span>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                        <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">Top tracks by {artist.name}</h4>
-                            {loadingTracks ? (
+                            <PopoverTrigger asChild>
+                                <span
+                                    onClick={() => searchTracks(artist.artistId, artist.name)}
+                                    className="cursor-pointer hover:text-primary transition-colors"
+                                >
+                                    {artist.name}
+                                </span>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
                                 <div className="space-y-2">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Skeleton key={i} className="h-10 w-full" />
-                                    ))}
+                                    <h4 className="font-semibold text-sm">
+                                        Top tracks by {artist.name}
+                                    </h4>
+                                    {loadingTracks ? (
+                                        <div className="space-y-2">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Skeleton key={i} className="h-10 w-full" />
+                                            ))}
+                                        </div>
+                                    ) : tracks.length > 0 ? (
+                                        TrackList(tracks)
+                                    ) : (
+                                        <p className="text-sm text-muted-foreground">
+                                            No tracks found
+                                        </p>
+                                    )}
                                 </div>
-                            ) : tracks.length > 0 ? (
-                                <ul className="space-y-1">
-                                    {tracks.map((track) => (
-                                        <li
-                                            onClick={() => {
-                                                playTrack(track);
-                                                handlePlayPause();
-                                            }}
-                                            className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                {track.album.images.length > 0 && (
-                                                    <img
-                                                        src={
-                                                            track.album.images[
-                                                                track.album.images.length - 1
-                                                            ].url
-                                                        }
-                                                        alt={track.album.name}
-                                                        className="w-8 h-8 rounded-sm object-cover flex-shrink-0"
-                                                    />
-                                                )}
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-medium text-sm truncate">
-                                                        {track.name}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground truncate">
-                                                        {track.artists
-                                                            .map((artist) => artist.name)
-                                                            .join(", ")}
-                                                    </p>
-                                                </div>
-
-                                                {isPlaying && track.id === currentTrack?.id
-                                                    ? "⏸️"
-                                                    : "▶️"}
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">No tracks found</p>
-                            )}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-            );
-        } else {
-            // B2B performance - multiple artists
-            return (
-                <span>
-                    {artists.map((artist, index) => (
-                        <span key={artist.artistId}>
-                            <Popover
-                                open={isPopoverOpen && popoverArtist === artist.name}
-                                onOpenChange={setIsPopoverOpen}
-                            >
-                                <PopoverTrigger asChild>
-                                    <span
-                                        onClick={() => searchTracks(artist.artistId, artist.name)}
-                                        className="cursor-pointer hover:text-primary transition-colors"
-                                    >
-                                        {artist.name}
-                                    </span>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80">
-                                    <div className="space-y-2">
-                                        <h4 className="font-semibold text-sm">
-                                            Top tracks by {artist.name}
-                                        </h4>
-                                        {loadingTracks ? (
-                                            <div className="space-y-2">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Skeleton key={i} className="h-10 w-full" />
-                                                ))}
-                                            </div>
-                                        ) : tracks.length > 0 ? (
-                                            <ul className="space-y-1">
-                                                {tracks.map((track) => (
-                                                    <li
-                                                        key={track.id}
-                                                        onClick={() => playTrack(track)}
-                                                        className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            {track.album.images.length > 0 && (
-                                                                <img
-                                                                    src={
-                                                                        track.album.images[
-                                                                            track.album.images
-                                                                                .length - 1
-                                                                        ].url
-                                                                    }
-                                                                    alt={track.album.name}
-                                                                    className="w-8 h-8 rounded-sm object-cover flex-shrink-0"
-                                                                />
-                                                            )}
-                                                            <div className="min-w-0 flex-1">
-                                                                <p className="font-medium text-sm truncate">
-                                                                    {track.name}
-                                                                </p>
-                                                                <p className="text-xs text-muted-foreground truncate">
-                                                                    {track.artists
-                                                                        .map(
-                                                                            (artist) => artist.name
-                                                                        )
-                                                                        .join(", ")}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground">
-                                                No tracks found
-                                            </p>
-                                        )}
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
-                            {index < artists.length - 1 && " b2b "}
-                        </span>
-                    ))}
-                </span>
-            );
-        }
+                            </PopoverContent>
+                        </Popover>
+                        {index < artists.length - 1 && " b2b "}
+                    </span>
+                ))}
+            </span>
+        );
     }
 
     function getStagesByDate(date: string) {
@@ -380,7 +308,7 @@ export default function Home() {
                             <ul className="space-y-1">
                                 {performances.map((performance) => (
                                     <li key={performance.id} className="mt-2">
-                                        {renderPerformance(performance)}
+                                        {Performance(performance)}
                                     </li>
                                 ))}
                             </ul>
