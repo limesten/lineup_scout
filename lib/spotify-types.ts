@@ -1,16 +1,7 @@
 // TypeScript definitions for Spotify iframe API
 // Based on the official Spotify Web Playback SDK documentation and iframe API usage
 
-/**
- * Playback state data structure returned by the Spotify iframe API
- */
-export interface PlaybackUpdateData {
-    position: number;
-    duration: number;
-    isBuffering: boolean;
-    isPaused: boolean;
-    playingURI: string;
-  }
+
   
   /**
    * Event data structure for playback started events
@@ -48,7 +39,6 @@ export interface PlaybackUpdateData {
      * Add an event listener for specific Spotify iframe API events
      */
     addListener(event: "ready", listener: () => void): void;
-    addListener(event: "playback_update", listener: SpotifyEventListener<PlaybackUpdateData>): void;
     addListener(event: "playback_started", listener: SpotifyEventListener<PlaybackStartedData>): void;
     addListener(event: string, listener: SpotifyEventListener): void;
   

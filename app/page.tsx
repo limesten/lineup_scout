@@ -6,11 +6,10 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+
 import type {
     SpotifyIframeApi,
     SpotifyEmbedController,
-    PlaybackUpdateData,
     PlaybackStartedData,
     SpotifyEvent,
 } from "@/lib/spotify-types";
@@ -56,8 +55,7 @@ export default function Home() {
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
-    const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
-    const [popoverArtist, setPopoverArtist] = useState<string | null>(null);
+    const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
     const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
     const embedRef = useRef<HTMLDivElement>(null);
     const spotifyEmbedControllerRef = useRef<SpotifyEmbedController | null>(null);
@@ -104,21 +102,6 @@ export default function Home() {
                     setPlayerLoaded(true);
                 });
 
-                const handlePlaybackUpdate = (e: SpotifyEvent<PlaybackUpdateData>) => {
-                    const { position, duration, isBuffering, isPaused, playingURI } = e.data;
-                    console.log(
-                        `Playback State updates:
-                position - ${position},
-                duration - ${duration},
-                isBuffering - ${isBuffering},
-                isPaused - ${isPaused},
-                playingURI - ${playingURI},
-                duration - ${duration}`
-                    );
-                };
-
-                spotifyEmbedController.addListener("playback_update", handlePlaybackUpdate);
-
                 spotifyEmbedController.addListener(
                     "playback_started",
                     (e: SpotifyEvent<PlaybackStartedData>) => {
@@ -133,7 +116,7 @@ export default function Home() {
 
         return () => {
             if (spotifyEmbedControllerRef.current) {
-                spotifyEmbedControllerRef.current.removeListener("playback_update");
+                spotifyEmbedControllerRef.current.removeListener("playback_started");
             }
         };
     }, [playerLoaded, iFrameAPI, uri]);
@@ -162,22 +145,30 @@ export default function Home() {
         return dates.length > 0 ? dates[0] : null;
     }
 
-    async function searchTracks(artistId: string, artistName: string) {
-        setPopoverArtist(artistName);
-        setIsPopoverOpen(true);
+    async function searchTracks(artistId: string, popoverId: string) {
+        setOpenPopoverId(popoverId);
         setLoadingTracks(true);
+
+        if (!artistId || artistId.trim() === "") {
+            setTracks([]);
+            setLoadingTracks(false);
+            return;
+        }
 
         try {
             const response = await fetch(`/api/spotify-search?artistId=${artistId}`);
 
             if (!response.ok) {
                 console.log("Error fetching tracks");
+                setTracks([]);
                 return;
             }
 
             const data = await response.json();
+
             setTracks((data.tracks || []).slice(0, 5));
         } catch (err) {
+            setTracks([]);
             console.error("Error searching tracks:", err);
         } finally {
             setLoadingTracks(false);
@@ -213,7 +204,7 @@ export default function Home() {
             <ul className="space-y-1">
                 {tracks.map((track) => (
                     <li
-                        key={track.id} // Add missing key
+                        key={track.id}
                         onClick={() => handleTrackClick(track)}
                         className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
                     >
@@ -248,44 +239,54 @@ export default function Home() {
 
         return (
             <span>
-                {artists.map((artist, index) => (
-                    <span key={artist.artistId}>
-                        <Popover
-                            open={isPopoverOpen && popoverArtist === artist.name}
-                            onOpenChange={setIsPopoverOpen}
-                        >
-                            <PopoverTrigger asChild>
-                                <span
-                                    onClick={() => searchTracks(artist.artistId, artist.name)}
-                                    className="cursor-pointer hover:text-primary transition-colors"
-                                >
-                                    {artist.name}
-                                </span>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                                <div className="space-y-2">
-                                    <h4 className="font-semibold text-sm">
-                                        Top tracks by {artist.name}
-                                    </h4>
-                                    {loadingTracks ? (
-                                        <div className="space-y-2">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Skeleton key={i} className="h-10 w-full" />
-                                            ))}
-                                        </div>
-                                    ) : tracks.length > 0 ? (
-                                        TrackList(tracks)
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">
-                                            No tracks found
-                                        </p>
-                                    )}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                        {index < artists.length - 1 && " b2b "}
-                    </span>
-                ))}
+                {artists.map((artist, index) => {
+                    const popoverId = `${performance.id}-${artist.name}-${index}`;
+                    
+                    return (
+                        <span key={popoverId}>
+                            <Popover
+                                open={openPopoverId === popoverId}
+                                onOpenChange={(open) => {
+                                    if (open) {
+                                        setOpenPopoverId(popoverId);
+                                    } else {
+                                        setOpenPopoverId(null);
+                                    }
+                                }}
+                            >
+                                <PopoverTrigger asChild>
+                                    <span
+                                        onClick={() => searchTracks(artist.artistId, popoverId)}
+                                        className="cursor-pointer hover:text-primary transition-colors"
+                                    >
+                                        {artist.name}
+                                    </span>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold text-sm">
+                                            Top tracks by {artist.name}
+                                        </h4>
+                                        {loadingTracks ? (
+                                            <div className="space-y-2">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Skeleton key={i} className="h-10 w-full" />
+                                                ))}
+                                            </div>
+                                        ) : tracks.length > 0 ? (
+                                            TrackList(tracks)
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">
+                                                No tracks found
+                                            </p>
+                                        )}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            {index < artists.length - 1 && " b2b "}
+                        </span>
+                    );
+                })}
             </span>
         );
     }
@@ -326,9 +327,14 @@ export default function Home() {
                     <div ref={embedRef} />
                 </div>
             </div>
-            <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
+            <h1 className="text-2xl font-bold mb-4">Tomorrowland 2025 Lineup Explorer</h1>
 
-            <ToggleGroup type="single" value={selectedWeekend} onValueChange={setSelectedWeekend}>
+            <ToggleGroup
+                type="single"
+                value={selectedWeekend}
+                onValueChange={setSelectedWeekend}
+                className="mb-2"
+            >
                 <ToggleGroupItem variant="outline" value="week_1">
                     Weekend 1
                 </ToggleGroupItem>
@@ -345,7 +351,7 @@ export default function Home() {
                 ))}
             </ToggleGroup>
 
-            <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-[80%]">
+            <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-5 w-[80%]">
                 {selectedDate && getStagesByDate(selectedDate)}
             </div>
         </div>
