@@ -1,11 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import lineupData from "@/lib/lineup.json";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import type {
+    SpotifyIframeApi,
+    SpotifyEmbedController,
+    PlaybackUpdateData,
+    PlaybackStartedData,
+    SpotifyEvent,
+} from "@/lib/spotify-types";
 
 const LineupData: LineupData = lineupData;
 
@@ -45,13 +53,113 @@ interface LineupData {
 
 export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
-    const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
-    const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
+    const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
     const [popoverArtist, setPopoverArtist] = useState<string | null>(null);
-    const [loadingIFrame, setLoadingIFrame] = useState<boolean>(false);
+    const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
+    const embedRef = useRef<HTMLDivElement>(null);
+    const spotifyEmbedControllerRef = useRef<SpotifyEmbedController | null>(null);
+    const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(undefined);
+    const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
+    const [uri, setUri] = useState<string>("spotify:episode:7makk4oTQel546B0PZlDM5");
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "https://open.spotify.com/embed/iframe-api/v1";
+        script.async = true;
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (iFrameAPI) {
+            return;
+        }
+
+        // Set up the global callback for when Spotify iframe API is ready
+        window.onSpotifyIframeApiReady = (SpotifyIframeApi: SpotifyIframeApi) => {
+            setIFrameAPI(SpotifyIframeApi);
+        };
+    }, [iFrameAPI]);
+
+    useEffect(() => {
+        if (playerLoaded || iFrameAPI === undefined) {
+            return;
+        }
+
+        iFrameAPI.createController(
+            embedRef.current,
+            {
+                width: "100%",
+                height: "352",
+                uri: uri,
+            },
+            (spotifyEmbedController: SpotifyEmbedController) => {
+                spotifyEmbedController.addListener("ready", () => {
+                    setPlayerLoaded(true);
+                });
+
+                const handlePlaybackUpdate = (e: SpotifyEvent<PlaybackUpdateData>) => {
+                    const { position, duration, isBuffering, isPaused, playingURI } = e.data;
+                    console.log(
+                        `Playback State updates:
+                position - ${position},
+                duration - ${duration},
+                isBuffering - ${isBuffering},
+                isPaused - ${isPaused},
+                playingURI - ${playingURI},
+                duration - ${duration}`
+                    );
+                };
+
+                spotifyEmbedController.addListener("playback_update", handlePlaybackUpdate);
+
+                spotifyEmbedController.addListener(
+                    "playback_started",
+                    (e: SpotifyEvent<PlaybackStartedData>) => {
+                        const { playingURI } = e.data;
+                        console.log(`The playback has started for: ${playingURI}`);
+                    }
+                );
+
+                spotifyEmbedControllerRef.current = spotifyEmbedController;
+            }
+        );
+
+        return () => {
+            if (spotifyEmbedControllerRef.current) {
+                spotifyEmbedControllerRef.current.removeListener("playback_update");
+            }
+        };
+    }, [playerLoaded, iFrameAPI, uri]);
+
+    // Handle track changes
+    useEffect(() => {
+        if (spotifyEmbedControllerRef.current) {
+            const spotifyUri = `spotify:track:${currentTrack?.id}`;
+            setUri(spotifyUri);
+            spotifyEmbedControllerRef.current.loadUri(spotifyUri);
+            spotifyEmbedControllerRef.current.play();
+            setIsPlaying(true);
+        }
+    }, [currentTrack]);
+
+    const handlePlayPause = () => {
+        if (!spotifyEmbedControllerRef.current) return;
+
+        if (isPlaying) {
+            spotifyEmbedControllerRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            spotifyEmbedControllerRef.current.play();
+            setIsPlaying(true);
+        }
+    };
 
     function getFirstDateOfWeekend(weekend: string): string | null {
         const weekData = LineupData[weekend as keyof LineupData];
@@ -72,9 +180,9 @@ export default function Home() {
     }, [selectedWeekend]);
 
     async function searchTracks(artistId: string, artistName: string) {
-        setSelectedArtist(artistName);
         setPopoverArtist(artistName);
         setIsPopoverOpen(true);
+        setLoadingTracks(true);
 
         try {
             const response = await fetch(`/api/spotify-search?artistId=${artistId}`);
@@ -86,24 +194,15 @@ export default function Home() {
 
             const data = await response.json();
             setTracks((data.tracks || []).slice(0, 5));
-            setPlayingTrack(null);
         } catch (err) {
             console.error("Error searching tracks:", err);
+        } finally {
+            setLoadingTracks(false);
         }
     }
 
     function playTrack(track: Track) {
-        setLoadingIFrame(true);
-        setPlayingTrack(track);
-
-        setTimeout(() => {
-            setLoadingIFrame(false);
-        }, 1000);
-    }
-
-    function handleIFrameLoad() {
-        console.log("IFrame loaded");
-        setLoadingIFrame(false);
+        setCurrentTrack(track);
     }
 
     function renderPerformance(performance: Performance) {
@@ -120,53 +219,64 @@ export default function Home() {
                     <PopoverTrigger>
                         <span
                             onClick={() => searchTracks(artist.artistId, artist.name)}
-                            className="cursor-pointer"
+                            className="cursor-pointer hover:text-primary transition-colors"
                         >
                             {artist.name}
                         </span>
                     </PopoverTrigger>
-                    <PopoverContent className="w-sm">
-                        {tracks.length > 0 && (
-                            <ul className="space-y-2">
-                                {tracks.map((track) => (
-                                    <li
-                                        key={`${track.id}test`}
-                                        onClick={() => playTrack(track)}
-                                        className="cursor-pointer"
-                                    >
-                                        {track.name} -{" "}
-                                        {track.artists.map((artist) => artist.name).join(", ")}
-                                    </li>
-                                ))}
-                                <div className="mt-3">
-                                    {/* Spotify player inside popover */}
-                                    {playingTrack ? (
-                                        loadingIFrame ? (
-                                            <Skeleton className="h-[80px] w-full rounded" />
-                                        ) : (
-                                            <iframe
-                                                src={`https://open.spotify.com/embed/track/${playingTrack.id}?utm_source=generator&theme=0`}
-                                                width="100%"
-                                                height="80"
-                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                                loading="lazy"
-                                                className="rounded"
-                                                onLoad={() => handleIFrameLoad()}
-                                                
-                                            />
-                                        )
-                                    ) : (
-                                        <Card className="h-[80px] py-0">
-                                            <CardContent className="h-full flex items-center justify-center p-0">
-                                                <p className="text-muted-foreground text-sm">
-                                                    Click a song to play it
-                                                </p>
-                                            </CardContent>
-                                        </Card>
-                                    )}
+                    <PopoverContent className="w-80">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-sm">Top tracks by {artist.name}</h4>
+                            {loadingTracks ? (
+                                <div className="space-y-2">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Skeleton key={i} className="h-10 w-full" />
+                                    ))}
                                 </div>
-                            </ul>
-                        )}
+                            ) : tracks.length > 0 ? (
+                                <ul className="space-y-1">
+                                    {tracks.map((track) => (
+                                        <li
+                                            onClick={() => {
+                                                playTrack(track);
+                                                handlePlayPause();
+                                            }}
+                                            className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {track.album.images.length > 0 && (
+                                                    <img
+                                                        src={
+                                                            track.album.images[
+                                                                track.album.images.length - 1
+                                                            ].url
+                                                        }
+                                                        alt={track.album.name}
+                                                        className="w-8 h-8 rounded-sm object-cover flex-shrink-0"
+                                                    />
+                                                )}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-medium text-sm truncate">
+                                                        {track.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground truncate">
+                                                        {track.artists
+                                                            .map((artist) => artist.name)
+                                                            .join(", ")}
+                                                    </p>
+                                                </div>
+
+                                                {isPlaying && track.id === currentTrack?.id
+                                                    ? "⏸️"
+                                                    : "▶️"}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">No tracks found</p>
+                            )}
+                        </div>
                     </PopoverContent>
                 </Popover>
             );
@@ -175,53 +285,71 @@ export default function Home() {
             return (
                 <span>
                     {artists.map((artist, index) => (
-                        <span key={`${artist.artistId}`}>
+                        <span key={artist.artistId}>
                             <Popover
                                 open={isPopoverOpen && popoverArtist === artist.name}
                                 onOpenChange={setIsPopoverOpen}
                             >
                                 <PopoverTrigger asChild>
                                     <span
-                                        key={artist.artistId}
                                         onClick={() => searchTracks(artist.artistId, artist.name)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer hover:text-primary transition-colors"
                                     >
                                         {artist.name}
                                     </span>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-sm">
-                                    {tracks.length > 0 && (
-                                        <ul className="space-y-2">
-                                            {tracks.map((track) => (
-                                                <li
-                                                    key={`${track.id}test`}
-                                                    onClick={() => playTrack(track)}
-                                                    className="cursor-pointer"
-                                                >
-                                                    {track.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                    <div className="mt-3">
-                                        {/* Spotify player inside popover */}
-                                        {playingTrack ? (
-                                            <iframe
-                                                src={`https://open.spotify.com/embed/track/${playingTrack.id}?utm_source=generator&theme=0`}
-                                                width="100%"
-                                                height="80"
-                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                                loading="lazy"
-                                                className="rounded"
-                                            />
+                                <PopoverContent className="w-80">
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold text-sm">
+                                            Top tracks by {artist.name}
+                                        </h4>
+                                        {loadingTracks ? (
+                                            <div className="space-y-2">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Skeleton key={i} className="h-10 w-full" />
+                                                ))}
+                                            </div>
+                                        ) : tracks.length > 0 ? (
+                                            <ul className="space-y-1">
+                                                {tracks.map((track) => (
+                                                    <li
+                                                        key={track.id}
+                                                        onClick={() => playTrack(track)}
+                                                        className="cursor-pointer p-2 rounded-md hover:bg-accent transition-colors"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            {track.album.images.length > 0 && (
+                                                                <img
+                                                                    src={
+                                                                        track.album.images[
+                                                                            track.album.images
+                                                                                .length - 1
+                                                                        ].url
+                                                                    }
+                                                                    alt={track.album.name}
+                                                                    className="w-8 h-8 rounded-sm object-cover flex-shrink-0"
+                                                                />
+                                                            )}
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="font-medium text-sm truncate">
+                                                                    {track.name}
+                                                                </p>
+                                                                <p className="text-xs text-muted-foreground truncate">
+                                                                    {track.artists
+                                                                        .map(
+                                                                            (artist) => artist.name
+                                                                        )
+                                                                        .join(", ")}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         ) : (
-                                            <Card className="h-[80px] py-0">
-                                                <CardContent className="h-full flex items-center justify-center p-0">
-                                                    <p className="text-muted-foreground text-sm">
-                                                        Click a song to play it
-                                                    </p>
-                                                </CardContent>
-                                            </Card>
+                                            <p className="text-sm text-muted-foreground">
+                                                No tracks found
+                                            </p>
                                         )}
                                     </div>
                                 </PopoverContent>
@@ -264,38 +392,33 @@ export default function Home() {
     }
 
     return (
-        <div>
-            <div className="container mx-auto px-4 flex flex-col items-center">
-                <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
-
-                <ToggleGroup
-                    type="single"
-                    value={selectedWeekend}
-                    onValueChange={setSelectedWeekend}
-                >
-                    <ToggleGroupItem variant="outline" value="week_1">
-                        Weekend 1
-                    </ToggleGroupItem>
-                    <ToggleGroupItem variant="outline" value="week_2">
-                        Weekend 2
-                    </ToggleGroupItem>
-                </ToggleGroup>
-
-                <ToggleGroup
-                    type="single"
-                    value={selectedDate || ""}
-                    onValueChange={setSelectedDate}
-                >
-                    {Object.keys(LineupData[selectedWeekend]).map((date) => (
-                        <ToggleGroupItem key={date} variant="outline" value={date}>
-                            {date}
-                        </ToggleGroupItem>
-                    ))}
-                </ToggleGroup>
-
-                <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-[80%]">
-                    {selectedDate && getStagesByDate(selectedDate)}
+        <div className="container mx-auto px-4 flex flex-col items-center">
+            <div>
+                <div className="w-0 h-0 overflow-hidden">
+                    <div ref={embedRef} />
                 </div>
+            </div>
+            <h1 className="text-2xl font-bold mb-4">Lineup Scout</h1>
+
+            <ToggleGroup type="single" value={selectedWeekend} onValueChange={setSelectedWeekend}>
+                <ToggleGroupItem variant="outline" value="week_1">
+                    Weekend 1
+                </ToggleGroupItem>
+                <ToggleGroupItem variant="outline" value="week_2">
+                    Weekend 2
+                </ToggleGroupItem>
+            </ToggleGroup>
+
+            <ToggleGroup type="single" value={selectedDate || ""} onValueChange={setSelectedDate}>
+                {Object.keys(LineupData[selectedWeekend]).map((date) => (
+                    <ToggleGroupItem key={date} variant="outline" value={date}>
+                        {date}
+                    </ToggleGroupItem>
+                ))}
+            </ToggleGroup>
+
+            <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4 w-[80%]">
+                {selectedDate && getStagesByDate(selectedDate)}
             </div>
         </div>
     );
