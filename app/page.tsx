@@ -79,6 +79,35 @@ interface LineupData {
     [weekKey: string]: DatePerformances;
 }
 
+/**
+ * AudioVisualizer component - displays animated bars when music is playing
+ * Each bar has its own unique animation pattern for realistic audio visualization
+ */
+function AudioVisualizer({ className = "" }: { className?: string }) {
+    const bars = [
+        { height: 12, animationClass: 'visualizer-bar-1' },
+        { height: 20, animationClass: 'visualizer-bar-2' },
+        { height: 16, animationClass: 'visualizer-bar-3' },
+        { height: 24, animationClass: 'visualizer-bar-4' },
+        { height: 14, animationClass: 'visualizer-bar-5' }
+    ];
+    
+    return (
+        <div className={`inline-flex items-end gap-[1px] ${className}`}>
+            {bars.map((bar, i) => (
+                <div
+                    key={i}
+                    className={`w-[2px] bg-primary/80 rounded-full ${bar.animationClass}`}
+                    style={{
+                        height: `${bar.height}px`,
+                        transformOrigin: 'bottom'
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
+
 export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -301,6 +330,9 @@ export default function Home() {
         return (
             <ul className="space-y-1">
                 {tracks.map((track) => {
+                    // Determine if this track is currently playing (for visualizer)
+                    const isTrackPlaying = currentTrack?.id === track.id && isPlaying;
+                    
                     // Determine the icon/state to show for this track
                     const getTrackIcon = () => {
                         if (isIOS) {
@@ -310,16 +342,11 @@ export default function Home() {
                                     <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
                                 );
                             }
-                            if (iOSReadyTrack === track.id) {
-                                return <span className="text-green-500">▶️</span>; // Green play button when ready
+                            if (isTrackPlaying) {
+                                return <AudioVisualizer className="w-6 h-4" />;
                             }
-                            if (currentTrack?.id === track.id && isPlaying) {
-                                return "⏸️";
-                            }
-                            return "▶️";
                         } else {
-                            // Non-iOS behavior (existing logic)
-                            return currentTrack?.id === track.id && isPlaying ? "⏸️" : "▶️";
+                            return isTrackPlaying ? <AudioVisualizer className="w-6 h-4" /> : "";
                         }
                     };
 
@@ -331,9 +358,16 @@ export default function Home() {
                             onClick={() => isClickable && handleTrackClick(track)}
                             className={`${
                                 isClickable ? "cursor-pointer hover:bg-accent" : "cursor-not-allowed opacity-75"
-                            } p-2 rounded-md transition-colors`}
+                            } p-2 rounded-md transition-colors relative`}
                         >
-                            <div className="flex items-center gap-2">
+                            {/* Semi-transparent visualizer background overlay when playing */}
+                            {isTrackPlaying && (
+                                <div className="absolute inset-0 bg-primary/5 rounded-md pointer-events-none">
+                                    <div className="absolute inset-2 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-sm" />
+                                </div>
+                            )}
+                            
+                            <div className="flex items-center gap-2 relative z-10">
                                 {/* Album image */}
                                 {track.album.images.length > 0 && (
                                     <img
@@ -345,7 +379,9 @@ export default function Home() {
 
                                 {/* Track info - clickable area */}
                                 <div className="min-w-0 flex-1">
-                                    <p className="font-medium text-sm truncate">{track.name}</p>
+                                    <p className={`font-medium text-sm truncate ${isTrackPlaying ? 'text-primary' : ''}`}>
+                                        {track.name}
+                                    </p>
                                     <p className="text-xs text-muted-foreground truncate">
                                         {track.artists.map((artist) => artist.name).join(", ")}
                                     </p>
