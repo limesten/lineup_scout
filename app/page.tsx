@@ -287,7 +287,7 @@ export default function Home() {
 
     // iOS-specific manual play function
     // This is called when user taps the green play button after track is ready
-    const handleIOSManualPlay = (track: Track) => {
+    const handleIOSManualPlay = () => {
         if (!spotifyEmbedControllerRef.current) return;
         
         // This play() call should work because it's triggered by user gesture
@@ -303,7 +303,7 @@ export default function Home() {
                 // Same track clicked on iOS
                 if (iOSReadyTrack === track.id) {
                     // Track is ready to play manually
-                    handleIOSManualPlay(track);
+                    handleIOSManualPlay();
                 } else if (isPlaying) {
                     // Track is playing, pause it
                     handlePlayPause();
@@ -333,10 +333,8 @@ export default function Home() {
                     // Determine if this track is currently playing (for visualizer)
                     const isTrackPlaying = currentTrack?.id === track.id && isPlaying;
                     
-                    // Determine the icon/state to show for this track
                     const getTrackIcon = () => {
                         if (isIOS) {
-                            // iOS-specific logic
                             if (iOSLoadingTrack === track.id) {
                                 return (
                                     <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
