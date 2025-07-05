@@ -123,9 +123,12 @@ export default function Home() {
     const [uri, setUri] = useState<string>("spotify:episode:7makk4oTQel546B0PZlDM5");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     
+    // Common loading state for both iOS and non-iOS
+    const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
+    // iOS-specific ready state (still needed for manual play button)
+    const [readyTrackId, setReadyTrackId] = useState<string | null>(null);
+    
     const [isIOS, setIsIOS] = useState<boolean>(false);
-    const [iOSLoadingTrack, setIOSLoadingTrack] = useState<string | null>(null);
-    const [iOSReadyTrack, setIOSReadyTrack] = useState<string | null>(null);
 
     useEffect(() => {
         setIsIOS(isIOSDevice());
@@ -175,20 +178,29 @@ export default function Home() {
                     "playback_started",
                     (e: SpotifyEvent<PlaybackStartedData>) => {
                         const { playingURI } = e.data;
-                        console.log(`The playback has started for: ${playingURI}`);
                         
-                        // On iOS, use this event to stop loading and show manual play button
-                        // (audio might not actually play due to iOS restrictions, but event still fires)
-                        if (isIOS) {
-                            // Extract track ID from Spotify URI (format: "spotify:track:TRACK_ID")
-                            const trackId = playingURI.split(':')[2];
-                            if (trackId) {
-                                setIOSLoadingTrack(null);
-                                setIOSReadyTrack(trackId); // Show manual play button
+                        // Extract track ID from Spotify URI (format: "spotify:track:TRACK_ID")
+                        const trackId = playingURI.split(':')[2];
+                        if (trackId) {
+                            // Clear loading state for both iOS and non-iOS
+                            setLoadingTrackId(null);
+                            
+                            if (isIOS) {
+                                // On iOS, show manual play button (audio might not actually play due to restrictions)
+                                setReadyTrackId(trackId);
+                            } else {
+                                // On non-iOS, track should already be playing automatically
+                                setIsPlaying(true);
                             }
                         }
                     }
                 );
+
+                spotifyEmbedController.addListener("playback_update", (e) => {
+                    if (e.data.position === e.data.duration) {
+                        setIsPlaying(false);
+                    }
+                });
 
                 spotifyEmbedControllerRef.current = spotifyEmbedController;
             }
@@ -207,27 +219,22 @@ export default function Home() {
         setSelectedDate(firstDate);
     }, [selectedWeekend]);
 
-    // Handle track changes - modified for iOS behavior
+    // Handle track changes - show loading spinner for both platforms
     useEffect(() => {
         if (spotifyEmbedControllerRef.current && currentTrack) {
             const spotifyUri = `spotify:track:${currentTrack.id}`;
             setUri(spotifyUri);
             spotifyEmbedControllerRef.current.loadUri(spotifyUri);
             
-            // On iOS, show loading state but still call play() to trigger events
-            if (isIOS) {
-                setIOSLoadingTrack(currentTrack.id);
-                setIOSReadyTrack(null);
-                setIsPlaying(false); // UI shows as not playing even though we call play()
-                
-                // Still call play() to trigger the playback_started event
-                // This won't actually play audio on iOS if it takes >1sec, but events will fire
-                spotifyEmbedControllerRef.current.play();
-            } else {
-                // On non-iOS devices, auto-play as before
-                spotifyEmbedControllerRef.current.play();
-                setIsPlaying(true);
-            }
+            // Show loading state for both platforms
+            setLoadingTrackId(currentTrack.id);
+            setReadyTrackId(null); // Clear any previous iOS ready state
+            setIsPlaying(false); // Reset playing state
+            
+            // Call play() to trigger the playback_started event
+            // On iOS: This won't actually play audio if it takes >1sec, but events will fire
+            // On non-iOS: This will auto-play and the playback_started event will confirm it
+            spotifyEmbedControllerRef.current.play();
         }
     }, [currentTrack, isIOS]);
 
@@ -298,7 +305,7 @@ export default function Home() {
         // This play() call should work because it's triggered by user gesture
         spotifyEmbedControllerRef.current.play();
         setIsPlaying(true);
-        setIOSReadyTrack(null); // Clear ready state as it's now playing
+        setReadyTrackId(null); // Clear ready state as it's now playing
     };
 
     function handlePopoverChange(open: boolean, popoverId: string) {
@@ -312,32 +319,24 @@ export default function Home() {
     }
 
     function handleTrackClick(track: Track) {
-        // Handle iOS different from other devices
-        if (isIOS) {
-            if (currentTrack?.id === track.id) {
-                // Same track clicked on iOS
-                if (iOSReadyTrack === track.id) {
-                    // Track is ready to play manually
-                    handleIOSManualPlay();
-                } else if (isPlaying) {
-                    // Track is playing, pause it
-                    handlePlayPause();
-                } else if (!iOSLoadingTrack) {
-                    // Track is paused, resume
-                    handlePlayPause();
-                }
-                // If track is loading, do nothing (user will wait for loading to complete)
-            } else {
-                // Different track clicked on iOS - load it
-                playTrack(track);
+        // Don't allow clicking if track is currently loading
+        if (loadingTrackId === track.id) {
+            return;
+        }
+        
+        if (currentTrack?.id === track.id) {
+            // Same track clicked
+            if (isIOS && readyTrackId === track.id) {
+                // iOS: Track is ready to play manually
+                handleIOSManualPlay();
+            } else if (isPlaying || !isIOS) {
+                // Both platforms: Toggle play/pause for playing tracks
+                // Non-iOS: Always allow toggle since tracks auto-play
+                handlePlayPause();
             }
         } else {
-            // Non-iOS behavior (existing logic)
-            if (currentTrack?.id === track.id) {
-                handlePlayPause();
-            } else {
-                playTrack(track);
-            }
+            // Different track clicked - load it
+            playTrack(track);
         }
     }
 
@@ -360,21 +359,23 @@ export default function Home() {
                     const isTrackPlaying = currentTrack?.id === track.id && isPlaying;
                     
                     const getTrackIcon = () => {
-                        if (isIOS) {
-                            if (iOSLoadingTrack === track.id) {
-                                return (
-                                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                                );
-                            }
-                            if (isTrackPlaying) {
-                                return <AudioVisualizer className="w-6 h-4" />;
-                            }
-                        } else {
-                            return isTrackPlaying ? <AudioVisualizer className="w-6 h-4" /> : "";
+                        // Show loading spinner for both iOS and non-iOS
+                        if (loadingTrackId === track.id) {
+                            return (
+                                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                            );
                         }
+                        
+                        // Show audio visualizer when track is playing
+                        if (isTrackPlaying) {
+                            return <AudioVisualizer className="w-6 h-4" />;
+                        }
+                        
+                        return "";
                     };
 
-                    const isClickable = !isIOS || iOSLoadingTrack !== track.id;
+                    // Track is clickable unless it's currently loading
+                    const isClickable = loadingTrackId !== track.id;
 
                     return (
                         <li
@@ -409,12 +410,12 @@ export default function Home() {
                                     <p className="text-xs text-muted-foreground truncate">
                                         {track.artists.map((artist) => artist.name).join(", ")}
                                     </p>
-                                    {/* iOS-specific loading message */}
-                                    {isIOS && iOSLoadingTrack === track.id && (
+                                    {/* Loading message for both platforms */}
+                                    {isIOS && loadingTrackId === track.id && (
                                         <p className="text-xs text-blue-500 mt-1">Loading track...</p>
                                     )}
                                     {/* iOS-specific ready message */}
-                                    {isIOS && iOSReadyTrack === track.id && (
+                                    {isIOS && readyTrackId === track.id && (
                                         <p className="text-xs text-green-500 mt-1">Ready to play! Tap to start</p>
                                     )}
                                 </div>
@@ -539,7 +540,7 @@ export default function Home() {
                 {selectedWeekend ?
                     Object.keys(LineupData[selectedWeekend]).map((date) => (
                         <ToggleGroupItem key={date} variant="outline" value={date} className="cursor-pointer">
-                            {formatDate(date)}
+                            <p suppressHydrationWarning>{formatDate(date)}</p>
                         </ToggleGroupItem>
                     ))
                 : null}
