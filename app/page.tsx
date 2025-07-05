@@ -232,11 +232,16 @@ export default function Home() {
     }, [currentTrack, isIOS]);
 
     function getFirstDateOfWeekend(weekend: string): string | null {
-        const weekData = LineupData[weekend as keyof LineupData];
-        if (!weekData) return null;
+        try {
+            const weekData = LineupData[weekend as keyof LineupData];
+            if (!weekData) return null;
 
-        const dates = Object.keys(weekData);
-        return dates.length > 0 ? dates[0] : null;
+            const dates = Object.keys(weekData);
+            return dates.length > 0 ? dates[0] : null;
+        } catch (error) {
+            console.error("Error getting first date of weekend:", error);
+            return null;
+        }
     }
 
     async function searchTracks(artistId: string, popoverId: string) {
@@ -461,6 +466,10 @@ export default function Home() {
     }
 
     function getStagesByDate(date: string) {
+        if (!LineupData[selectedWeekend]) {
+            return null;
+        }
+
         const dateData = LineupData[selectedWeekend][date];
 
         if (!dateData) {
@@ -496,7 +505,7 @@ export default function Home() {
                     <div ref={embedRef} />
                 </div>
             </div>
-            <h1 className="text-2xl font-bold mb-4">Tomorrowland 2025 Lineup Explorer</h1>
+            <h1 className="text-2xl font-bold my-4">Tomorrowland 2025 Lineup Explorer</h1>
 
             <ToggleGroup
                 type="single"
@@ -504,20 +513,22 @@ export default function Home() {
                 onValueChange={setSelectedWeekend}
                 className="mb-2"
             >
-                <ToggleGroupItem variant="outline" value="week_1">
+                <ToggleGroupItem variant="outline" value="week_1" className="cursor-pointer">
                     Weekend 1
                 </ToggleGroupItem>
-                <ToggleGroupItem variant="outline" value="week_2">
+                <ToggleGroupItem variant="outline" value="week_2" className="cursor-pointer">
                     Weekend 2
                 </ToggleGroupItem>
             </ToggleGroup>
 
             <ToggleGroup type="single" value={selectedDate || ""} onValueChange={setSelectedDate}>
-                {Object.keys(LineupData[selectedWeekend]).map((date) => (
-                    <ToggleGroupItem key={date} variant="outline" value={date}>
-                        {date}
-                    </ToggleGroupItem>
-                ))}
+                {selectedWeekend ?
+                    Object.keys(LineupData[selectedWeekend]).map((date) => (
+                        <ToggleGroupItem key={date} variant="outline" value={date} className="cursor-pointer">
+                            {date}
+                        </ToggleGroupItem>
+                    ))
+                : null}
             </ToggleGroup>
 
             <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-5 w-[80%]">
