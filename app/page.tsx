@@ -6,6 +6,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AudioVisualizer } from "@/components/audio-visualizer";
 
 import type {
     SpotifyIframeApi,
@@ -79,35 +80,6 @@ interface LineupData {
     [weekKey: string]: DatePerformances;
 }
 
-/**
- * AudioVisualizer component - displays animated bars when music is playing
- * Each bar has its own unique animation pattern for realistic audio visualization
- */
-function AudioVisualizer({ className = "" }: { className?: string }) {
-    const bars = [
-        { height: 12, animationClass: 'visualizer-bar-1' },
-        { height: 20, animationClass: 'visualizer-bar-2' },
-        { height: 16, animationClass: 'visualizer-bar-3' },
-        { height: 24, animationClass: 'visualizer-bar-4' },
-        { height: 14, animationClass: 'visualizer-bar-5' }
-    ];
-    
-    return (
-        <div className={`inline-flex items-end gap-[1px] ${className}`}>
-            {bars.map((bar, i) => (
-                <div
-                    key={i}
-                    className={`w-[2px] bg-primary/80 rounded-full ${bar.animationClass}`}
-                    style={{
-                        height: `${bar.height}px`,
-                        transformOrigin: 'bottom'
-                    }}
-                />
-            ))}
-        </div>
-    );
-}
-
 export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -120,7 +92,7 @@ export default function Home() {
     const spotifyEmbedControllerRef = useRef<SpotifyEmbedController | null>(null);
     const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(undefined);
     const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
-    const [uri, setUri] = useState<string>("spotify:episode:7makk4oTQel546B0PZlDM5");
+    const [uri, setUri] = useState<string>("spotify:track:7MIhUdNJtaOnDmC5nBC1fb");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     
     // Common loading state for both iOS and non-iOS
@@ -223,6 +195,7 @@ export default function Home() {
     useEffect(() => {
         if (spotifyEmbedControllerRef.current && currentTrack) {
             const spotifyUri = `spotify:track:${currentTrack.id}`;
+            console.log("Setting URI", spotifyUri);
             setUri(spotifyUri);
             spotifyEmbedControllerRef.current.loadUri(spotifyUri);
             
@@ -259,6 +232,11 @@ export default function Home() {
             setTracks([]);
             setLoadingTracks(false);
             return;
+        }
+
+        // This is a workaround to load the first song after page refresh
+        if (isIOS) {
+            spotifyEmbedControllerRef.current?.loadUri("spotify:track:7MIhUdNJtaOnDmC5nBC1fb");
         }
 
         try {
