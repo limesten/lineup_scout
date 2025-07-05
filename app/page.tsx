@@ -301,6 +301,16 @@ export default function Home() {
         setIOSReadyTrack(null); // Clear ready state as it's now playing
     };
 
+    function handlePopoverChange(open: boolean, popoverId: string) {
+        if (open) {
+            setOpenPopoverId(popoverId);
+        } else {
+            setOpenPopoverId(null);
+            setCurrentTrack(null);
+            spotifyEmbedControllerRef.current?.pause();
+        }
+    }
+
     function handleTrackClick(track: Track) {
         // Handle iOS different from other devices
         if (isIOS) {
@@ -329,6 +339,17 @@ export default function Home() {
                 playTrack(track);
             }
         }
+    }
+
+    function formatDate(date: string) {
+        const dateObj = new Date(date);
+        const formattedDate = dateObj.toLocaleDateString("en-GB", {
+            weekday: "short",
+            day: "numeric",
+            month: "short"
+        });
+
+        return formattedDate;
     }
 
     function TrackList(tracks: Track[]) {
@@ -419,14 +440,7 @@ export default function Home() {
                         <span key={popoverId}>
                             <Popover
                                 open={openPopoverId === popoverId}
-                                onOpenChange={(open) => {
-                                    if (open) {
-                                        setOpenPopoverId(popoverId);
-                                    } else {
-                                        setOpenPopoverId(null);
-                                        spotifyEmbedControllerRef.current?.pause();
-                                    }
-                                }}
+                                onOpenChange={(open) => handlePopoverChange(open, popoverId)}
                             >
                                 <PopoverTrigger asChild>
                                     <span
@@ -525,7 +539,7 @@ export default function Home() {
                 {selectedWeekend ?
                     Object.keys(LineupData[selectedWeekend]).map((date) => (
                         <ToggleGroupItem key={date} variant="outline" value={date} className="cursor-pointer">
-                            {date}
+                            {formatDate(date)}
                         </ToggleGroupItem>
                     ))
                 : null}
