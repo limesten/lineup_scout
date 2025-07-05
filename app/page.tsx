@@ -520,7 +520,8 @@ export default function Home() {
                     <div ref={embedRef} />
                 </div>
             </div>
-            <h1 className="text-2xl font-bold my-4">Tomorrowland 2025 Lineup Explorer</h1>
+            <h1 className="text-2xl font-bold mt-4">Tomorrowland 2025 Lineup Explorer</h1>
+            <p className="text-md text-muted-foreground mb-4 italic">Find your vibe</p>
 
             <ToggleGroup
                 type="single"
