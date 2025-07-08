@@ -28,7 +28,7 @@
   export interface SpotifyControllerOptions {
     width: string | number;
     height: string | number;
-    uri: string;
+    uri?: string;
   }
   
   /**

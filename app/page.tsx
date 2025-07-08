@@ -23,26 +23,21 @@ const LineupData: LineupData = lineupData;
  * iOS autoplay restrictions (songs won't play if loading takes >1 second)
  */
 function isIOSDevice(): boolean {
-    if (typeof window === 'undefined') return false;
-    
+    if (typeof window === "undefined") return false;
+
     const userAgent = navigator.userAgent;
-    
+
     // Traditional iOS detection
     if (/iPad|iPhone|iPod/.test(userAgent)) {
         return true;
     }
-    
+
     // Modern iPad detection (iPadOS 13+ may identify as macOS)
     // Check for touch support + Safari on Mac (likely iPad)
-    if (/Macintosh/.test(userAgent) && 'ontouchend' in document) {
+    if (/Macintosh/.test(userAgent) && "ontouchend" in document) {
         return true;
     }
-    
-    // Additional iPad detection using platform API if available
-    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
-        return true;
-    }
-    
+
     return false;
 }
 
@@ -84,7 +79,7 @@ export default function Home() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [selectedWeekend, setSelectedWeekend] = useState<string>("week_1");
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<string | null>("2025-07-18");
     const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
     const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
 
@@ -94,12 +89,12 @@ export default function Home() {
     const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
     const [uri, setUri] = useState<string>("spotify:track:7MIhUdNJtaOnDmC5nBC1fb");
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    
+
     // Common loading state for both iOS and non-iOS
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
     // iOS-specific ready state (still needed for manual play button)
     const [readyTrackId, setReadyTrackId] = useState<string | null>(null);
-    
+
     const [isIOS, setIsIOS] = useState<boolean>(false);
 
     useEffect(() => {
@@ -142,21 +137,19 @@ export default function Home() {
             (spotifyEmbedController: SpotifyEmbedController) => {
                 spotifyEmbedController.addListener("ready", () => {
                     setPlayerLoaded(true);
-                    // Note: On iOS, we use the "playback_started" event instead of "ready" 
-                    // to transition from loading to ready state
                 });
 
                 spotifyEmbedController.addListener(
                     "playback_started",
                     (e: SpotifyEvent<PlaybackStartedData>) => {
                         const { playingURI } = e.data;
-                        
+
                         // Extract track ID from Spotify URI (format: "spotify:track:TRACK_ID")
-                        const trackId = playingURI.split(':')[2];
+                        const trackId = playingURI.split(":")[2];
                         if (trackId) {
                             // Clear loading state for both iOS and non-iOS
                             setLoadingTrackId(null);
-                            
+
                             if (isIOS) {
                                 // On iOS, show manual play button (audio might not actually play due to restrictions)
                                 setReadyTrackId(trackId);
@@ -186,24 +179,18 @@ export default function Home() {
         };
     }, [playerLoaded, iFrameAPI, uri, isIOS, currentTrack]);
 
-    useEffect(() => {
-        const firstDate = getFirstDateOfWeekend(selectedWeekend);
-        setSelectedDate(firstDate);
-    }, [selectedWeekend]);
-
     // Handle track changes - show loading spinner for both platforms
     useEffect(() => {
         if (spotifyEmbedControllerRef.current && currentTrack) {
             const spotifyUri = `spotify:track:${currentTrack.id}`;
-            console.log("Setting URI", spotifyUri);
             setUri(spotifyUri);
             spotifyEmbedControllerRef.current.loadUri(spotifyUri);
-            
+
             // Show loading state for both platforms
             setLoadingTrackId(currentTrack.id);
             setReadyTrackId(null); // Clear any previous iOS ready state
             setIsPlaying(false); // Reset playing state
-            
+
             // Call play() to trigger the playback_started event
             // On iOS: This won't actually play audio if it takes >1sec, but events will fire
             // On non-iOS: This will auto-play and the playback_started event will confirm it
@@ -223,6 +210,12 @@ export default function Home() {
             return null;
         }
     }
+
+    const handleWeekendChange = (newWeekend: string) => {
+        setSelectedWeekend(newWeekend);
+        const firstDate = getFirstDateOfWeekend(newWeekend);
+        setSelectedDate(firstDate);
+    };
 
     async function searchTracks(artistId: string, popoverId: string) {
         setOpenPopoverId(popoverId);
@@ -279,7 +272,7 @@ export default function Home() {
     // This is called when user taps the green play button after track is ready
     const handleIOSManualPlay = () => {
         if (!spotifyEmbedControllerRef.current) return;
-        
+
         // This play() call should work because it's triggered by user gesture
         spotifyEmbedControllerRef.current.play();
         setIsPlaying(true);
@@ -291,8 +284,10 @@ export default function Home() {
             setOpenPopoverId(popoverId);
         } else {
             setOpenPopoverId(null);
-            setCurrentTrack(null);
-            spotifyEmbedControllerRef.current?.pause();
+            if (isPlaying) {
+                setCurrentTrack(null);
+                spotifyEmbedControllerRef.current?.pause();
+            }
         }
     }
 
@@ -301,7 +296,7 @@ export default function Home() {
         if (loadingTrackId === track.id) {
             return;
         }
-        
+
         if (currentTrack?.id === track.id) {
             // Same track clicked
             if (isIOS && readyTrackId === track.id) {
@@ -320,10 +315,11 @@ export default function Home() {
 
     function formatDate(date: string) {
         const dateObj = new Date(date);
-        const formattedDate = dateObj.toLocaleDateString("en-GB", {
+        const formattedDate = dateObj.toLocaleDateString("en-US", {
+            timeZone: "Europe/Berlin",
             weekday: "short",
+            month: "short",
             day: "numeric",
-            month: "short"
         });
 
         return formattedDate;
@@ -335,7 +331,7 @@ export default function Home() {
                 {tracks.map((track) => {
                     // Determine if this track is currently playing (for visualizer)
                     const isTrackPlaying = currentTrack?.id === track.id && isPlaying;
-                    
+
                     const getTrackIcon = () => {
                         // Show loading spinner for both iOS and non-iOS
                         if (loadingTrackId === track.id) {
@@ -343,12 +339,12 @@ export default function Home() {
                                 <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
                             );
                         }
-                        
+
                         // Show audio visualizer when track is playing
                         if (isTrackPlaying) {
                             return <AudioVisualizer className="w-6 h-4" />;
                         }
-                        
+
                         return "";
                     };
 
@@ -360,7 +356,9 @@ export default function Home() {
                             key={track.id}
                             onClick={() => isClickable && handleTrackClick(track)}
                             className={`${
-                                isClickable ? "cursor-pointer hover:bg-accent" : "cursor-not-allowed opacity-75"
+                                isClickable
+                                    ? "cursor-pointer hover:bg-accent"
+                                    : "cursor-not-allowed opacity-75"
                             } p-2 rounded-md transition-colors relative`}
                         >
                             {/* Semi-transparent visualizer background overlay when playing */}
@@ -369,7 +367,7 @@ export default function Home() {
                                     <div className="absolute inset-2 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-sm" />
                                 </div>
                             )}
-                            
+
                             <div className="flex items-center gap-2 relative z-10">
                                 {/* Album image */}
                                 {track.album.images.length > 0 && (
@@ -382,7 +380,11 @@ export default function Home() {
 
                                 {/* Track info - clickable area */}
                                 <div className="min-w-0 flex-1">
-                                    <p className={`font-medium text-sm truncate ${isTrackPlaying ? 'text-primary' : ''}`}>
+                                    <p
+                                        className={`font-medium text-sm truncate ${
+                                            isTrackPlaying ? "text-primary" : ""
+                                        }`}
+                                    >
                                         {track.name}
                                     </p>
                                     <p className="text-xs text-muted-foreground truncate">
@@ -390,11 +392,15 @@ export default function Home() {
                                     </p>
                                     {/* Loading message for both platforms */}
                                     {isIOS && loadingTrackId === track.id && (
-                                        <p className="text-xs text-blue-500 mt-1">Loading track...</p>
+                                        <p className="text-xs text-blue-500 mt-1">
+                                            Loading track...
+                                        </p>
                                     )}
                                     {/* iOS-specific ready message */}
                                     {isIOS && readyTrackId === track.id && (
-                                        <p className="text-xs text-green-500 mt-1">Ready to play! Tap to start</p>
+                                        <p className="text-xs text-green-500 mt-1">
+                                            Ready to play! Tap to start
+                                        </p>
                                     )}
                                 </div>
 
@@ -414,7 +420,7 @@ export default function Home() {
             <span>
                 {artists.map((artist, index) => {
                     const popoverId = `${performance.id}-${artist.name}-${index}`;
-                    
+
                     return (
                         <span key={popoverId}>
                             <Popover
@@ -504,7 +510,7 @@ export default function Home() {
             <ToggleGroup
                 type="single"
                 value={selectedWeekend}
-                onValueChange={setSelectedWeekend}
+                onValueChange={handleWeekendChange}
                 className="mb-2"
             >
                 <ToggleGroupItem variant="outline" value="week_1" className="cursor-pointer">
@@ -516,13 +522,18 @@ export default function Home() {
             </ToggleGroup>
 
             <ToggleGroup type="single" value={selectedDate || ""} onValueChange={setSelectedDate}>
-                {selectedWeekend ?
-                    Object.keys(LineupData[selectedWeekend]).map((date) => (
-                        <ToggleGroupItem key={date} variant="outline" value={date} className="cursor-pointer">
-                            <p suppressHydrationWarning>{formatDate(date)}</p>
-                        </ToggleGroupItem>
-                    ))
-                : null}
+                {selectedWeekend
+                    ? Object.keys(LineupData[selectedWeekend]).map((date) => (
+                          <ToggleGroupItem
+                              key={date}
+                              variant="outline"
+                              value={date}
+                              className="cursor-pointer"
+                          >
+                              <p suppressHydrationWarning>{formatDate(date)}</p>
+                          </ToggleGroupItem>
+                      ))
+                    : null}
             </ToggleGroup>
 
             <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-5 w-[80%]">
