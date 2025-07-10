@@ -470,6 +470,15 @@
               "artistId": "6ArtT03Hv9H55Y3EVa7d2V"
             }
           ]
+        },
+        {
+          "id": "8",
+          "artists": [
+            {
+              "name": "X&DXNØ",
+              "artistId": ""
+            }
+          ]
         }
       ],
       "CAGE": [
@@ -1281,6 +1290,15 @@
               "artistId": "2MdFJmUQf3ckA99IhFF9my"
             }
           ]
+        },
+        {
+          "id": "10",
+          "artists": [
+            {
+              "name": "DAVID HERRLICH",
+              "artistId": "3OVR88IQPPtqTucSlpGYrN"
+            }
+          ]
         }
       ]
     },
@@ -1381,15 +1399,6 @@
         },
         {
           "id": "10",
-          "artists": [
-            {
-              "name": "More to be announced",
-              "artistId": "1RcdQzrsD7kUquJGSJdPAn"
-            }
-          ]
-        },
-        {
-          "id": "11",
           "artists": [
             {
               "name": "Nicky Romero",
@@ -2246,8 +2255,8 @@
           "id": "4",
           "artists": [
             {
-              "name": "More to be announced",
-              "artistId": "1RcdQzrsD7kUquJGSJdPAn"
+              "name": "Yamagucci",
+              "artistId": "6EuSg8aungYTh6vNgL1EpG"
             }
           ]
         },
@@ -2872,15 +2881,6 @@
               "artistId": "0eS4qebxkiPYm1j3n8hRvD"
             }
           ]
-        },
-        {
-          "id": "8",
-          "artists": [
-            {
-              "name": "X&DXNØ",
-              "artistId": ""
-            }
-          ]
         }
       ],
       "CAGE": [
@@ -3440,8 +3440,8 @@
           "id": "6",
           "artists": [
             {
-              "name": "Ruze",
-              "artistId": "6tw9vg0neaIiSDP65GYDWW"
+              "name": "Jess Bays",
+              "artistId": "5xEJ7FQOtIUMLdnKyZrvPB"
             }
           ]
         },
@@ -5050,7 +5050,7 @@
           "artists": [
             {
               "name": "Symphony Of Unity",
-              "artistId": "6AvBsDOrRn8rAdJdj3srdJ"
+              "artistId": ""
             }
           ]
         }
@@ -6225,6 +6225,15 @@
             {
               "name": "MORTEN",
               "artistId": "19HFRWmRCl27kTk6LeqAO8"
+            }
+          ]
+        },
+        {
+          "id": "11",
+          "artists": [
+            {
+              "name": "Elfigo",
+              "artistId": "1f7tXw5OzDgWVBpEZ0hjJs"
             }
           ]
         }
