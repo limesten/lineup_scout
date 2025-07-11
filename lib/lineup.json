@@ -630,8 +630,12 @@
           "id": "4",
           "artists": [
             {
-              "name": "More to be announced",
-              "artistId": "1RcdQzrsD7kUquJGSJdPAn"
+              "name": "Gueush",
+              "artistId": "0TRKuU5ai1F2WqHTWa4CIC"
+            },
+            {
+              "name": "Marcus Toast",
+              "artistId": ""
             }
           ]
         },
@@ -3246,8 +3250,8 @@
           "id": "5",
           "artists": [
             {
-              "name": "More to be announced",
-              "artistId": "1RcdQzrsD7kUquJGSJdPAn"
+              "name": "Mosoo",
+              "artistId": "4tb4RmDN2nG89wOo7SQLzh"
             }
           ]
         },
@@ -3265,10 +3269,6 @@
           "artists": [
             {
               "name": "Tess",
-              "artistId": "4tb4RmDN2nG89wOo7SQLzh"
-            },
-            {
-              "name": "Mosoo",
               "artistId": "4tb4RmDN2nG89wOo7SQLzh"
             }
           ]
