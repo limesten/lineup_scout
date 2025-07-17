@@ -2,7 +2,6 @@ import type {
     stagesTable,
     artistsTable,
 } from "@/server/db/schema";
-import { compileFunction } from "vm";
 
 export type Stage = typeof stagesTable.$inferSelect;
 export type Artist = typeof artistsTable.$inferSelect;
