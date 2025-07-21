@@ -12,8 +12,6 @@ import { eq, inArray, desc } from "drizzle-orm";
 import type { Artist, CompleteLineup, LineupPerformance } from "@/lib/db-types";
 
 export async function getCompleteLineup(): Promise<CompleteLineup> {
-    // TODO: implement relations and do it all in one query
-
     const performanceData = await db
         .select({
             performance: performanceTable,
