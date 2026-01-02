@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SpotifyAuthProvider } from "@/contexts/SpotifyAuthContext";
 import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
@@ -28,7 +29,9 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <ThemeProvider attribute="class" forcedTheme="dark" disableTransitionOnChange>
-                    {children}
+                    <SpotifyAuthProvider>
+                        {children}
+                    </SpotifyAuthProvider>
                     <Analytics />
                 </ThemeProvider>
             </body>

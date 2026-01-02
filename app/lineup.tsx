@@ -1,19 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AudioVisualizer } from "@/components/audio-visualizer";
 import { LINEUP_DATES, Weekend } from "@/lib/lineup-settings";
-
-import type {
-    SpotifyIframeApi,
-    SpotifyEmbedController,
-    PlaybackStartedData,
-    SpotifyEvent,
-} from "@/lib/spotify-types";
+import { useSpotifyAuth } from "@/contexts/SpotifyAuthContext";
+import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import { CompleteLineup, LineupPerformance } from "@/lib/db-types";
 
 interface Track {
@@ -28,30 +23,6 @@ interface Track {
     artists: { name: string }[];
 }
 
-/**
- * Utility function to detect iOS devices (including modern iPads)
- * Used to implement iOS-specific song playback behavior to work around
- * iOS autoplay restrictions (songs won't play if loading takes >1 second)
- */
-function isIOSDevice(): boolean {
-    if (typeof window === "undefined") return false;
-
-    const userAgent = navigator.userAgent;
-
-    // Traditional iOS detection
-    if (/iPad|iPhone|iPod/.test(userAgent)) {
-        return true;
-    }
-
-    // Modern iPad detection (iPadOS 13+ may identify as macOS)
-    // Check for touch support + Safari on Mac (likely iPad)
-    if (/Macintosh/.test(userAgent) && "ontouchend" in document) {
-        return true;
-    }
-
-    return false;
-}
-
 interface LineupProps {
     lineupData: CompleteLineup;
 }
@@ -63,121 +34,13 @@ export default function Lineup({ lineupData }: LineupProps) {
     const [selectedDate, setSelectedDate] = useState<string | null>(LINEUP_DATES.WEEKEND_1[0]);
     const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
     const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
-
-    const embedRef = useRef<HTMLDivElement>(null);
-    const spotifyEmbedControllerRef = useRef<SpotifyEmbedController | null>(null);
-    const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(undefined);
-    const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
-    const [uri, setUri] = useState<string>("spotify:track:7MIhUdNJtaOnDmC5nBC1fb");
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
-    // Common loading state for both iOS and non-iOS
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
-    // iOS-specific ready state (still needed for manual play button)
-    const [readyTrackId, setReadyTrackId] = useState<string | null>(null);
 
-    const [isIOS, setIsIOS] = useState<boolean>(false);
+    const { isAuthenticated } = useSpotifyAuth();
+    const { player, isReady, playbackState, error: playerError, play } = useSpotifyPlayer(isAuthenticated);
 
-    useEffect(() => {
-        setIsIOS(isIOSDevice());
-    }, []);
-
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://open.spotify.com/embed/iframe-api/v1";
-        script.async = true;
-        document.body.appendChild(script);
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (iFrameAPI) {
-            return;
-        }
-
-        // Set up the global callback for when Spotify iframe API is ready
-        window.onSpotifyIframeApiReady = (SpotifyIframeApi: SpotifyIframeApi) => {
-            setIFrameAPI(SpotifyIframeApi);
-        };
-    }, [iFrameAPI]);
-
-    useEffect(() => {
-        if (playerLoaded || iFrameAPI === undefined) {
-            return;
-        }
-
-        iFrameAPI.createController(
-            embedRef.current,
-            {
-                width: "100%",
-                height: "352",
-                uri: uri,
-            },
-            (spotifyEmbedController: SpotifyEmbedController) => {
-                spotifyEmbedController.addListener("ready", () => {
-                    setPlayerLoaded(true);
-                });
-
-                spotifyEmbedController.addListener(
-                    "playback_started",
-                    (e: SpotifyEvent<PlaybackStartedData>) => {
-                        const { playingURI } = e.data;
-
-                        // Extract track ID from Spotify URI (format: "spotify:track:TRACK_ID")
-                        const trackId = playingURI.split(":")[2];
-                        if (trackId) {
-                            // Clear loading state for both iOS and non-iOS
-                            setLoadingTrackId(null);
-
-                            if (isIOS) {
-                                // On iOS, show manual play button (audio might not actually play due to restrictions)
-                                setReadyTrackId(trackId);
-                            } else {
-                                // On non-iOS, track should already be playing automatically
-                                setIsPlaying(true);
-                            }
-                        }
-                    }
-                );
-
-                spotifyEmbedController.addListener("playback_update", (e) => {
-                    if (e.data.position === e.data.duration) {
-                        setIsPlaying(false);
-                    }
-                });
-
-                spotifyEmbedControllerRef.current = spotifyEmbedController;
-            }
-        );
-
-        return () => {
-            if (spotifyEmbedControllerRef.current) {
-                spotifyEmbedControllerRef.current.removeListener("playback_started");
-                spotifyEmbedControllerRef.current.removeListener("ready");
-            }
-        };
-    }, [playerLoaded, iFrameAPI, uri, isIOS, currentTrack]);
-
-    // Handle track changes - show loading spinner for both platforms
-    useEffect(() => {
-        if (spotifyEmbedControllerRef.current && currentTrack) {
-            const spotifyUri = `spotify:track:${currentTrack.id}`;
-            setUri(spotifyUri);
-            spotifyEmbedControllerRef.current.loadUri(spotifyUri);
-
-            // Show loading state for both platforms
-            setLoadingTrackId(currentTrack.id);
-            setReadyTrackId(null); // Clear any previous iOS ready state
-            setIsPlaying(false); // Reset playing state
-
-            // Call play() to trigger the playback_started event
-            // On iOS: This won't actually play audio if it takes >1sec, but events will fire
-            // On non-iOS: This will auto-play and the playback_started event will confirm it
-            spotifyEmbedControllerRef.current.play();
-        }
-    }, [currentTrack, isIOS]);
+    // Derive playing state from SDK playback state
+    const isPlaying = playbackState !== null && !playbackState.paused;
 
     const handleWeekendChange = (newWeekend: Weekend) => {
         if (!newWeekend) {
@@ -196,11 +59,6 @@ export default function Lineup({ lineupData }: LineupProps) {
             setTracks([]);
             setLoadingTracks(false);
             return;
-        }
-
-        // This is an iOS workaround to load the first song after page refresh
-        if (isIOS) {
-            spotifyEmbedControllerRef.current?.loadUri("spotify:track:7MIhUdNJtaOnDmC5nBC1fb");
         }
 
         const url = new URL(spotifyUrl);
@@ -227,31 +85,22 @@ export default function Lineup({ lineupData }: LineupProps) {
         }
     }
 
-    function playTrack(track: Track) {
+    async function playTrack(track: Track) {
+        if (!isAuthenticated || !isReady) {
+            return;
+        }
         setCurrentTrack(track);
+        setLoadingTrackId(track.id);
+        try {
+            await play(`spotify:track:${track.id}`);
+        } finally {
+            setLoadingTrackId(null);
+        }
     }
 
-    const handlePlayPause = () => {
-        if (!spotifyEmbedControllerRef.current) return;
-
-        if (isPlaying) {
-            spotifyEmbedControllerRef.current.pause();
-            setIsPlaying(false);
-        } else {
-            spotifyEmbedControllerRef.current.play();
-            setIsPlaying(true);
-        }
-    };
-
-    // iOS-specific manual play function
-    // This is called when user taps the green play button after track is ready
-    const handleIOSManualPlay = () => {
-        if (!spotifyEmbedControllerRef.current) return;
-
-        // This play() call should work because it's triggered by user gesture
-        spotifyEmbedControllerRef.current.play();
-        setIsPlaying(true);
-        setReadyTrackId(null); // Clear ready state as it's now playing
+    const handlePlayPause = async () => {
+        if (!player) return;
+        await player.togglePlay();
     };
 
     function handlePopoverChange(open: boolean, popoverId: string) {
@@ -259,29 +108,26 @@ export default function Lineup({ lineupData }: LineupProps) {
             setOpenPopoverId(popoverId);
         } else {
             setOpenPopoverId(null);
-            if (isPlaying) {
+            if (isPlaying && player) {
                 setCurrentTrack(null);
-                spotifyEmbedControllerRef.current?.pause();
+                player.pause();
             }
         }
     }
 
     function handleTrackClick(track: Track) {
+        if (!isAuthenticated) {
+            return;
+        }
+
         // Don't allow clicking if track is currently loading
         if (loadingTrackId === track.id) {
             return;
         }
 
         if (currentTrack?.id === track.id) {
-            // Same track clicked
-            if (isIOS && readyTrackId === track.id) {
-                // iOS: Track is ready to play manually
-                handleIOSManualPlay();
-            } else if (isPlaying || !isIOS) {
-                // Both platforms: Toggle play/pause for playing tracks
-                // Non-iOS: Always allow toggle since tracks auto-play
-                handlePlayPause();
-            }
+            // Same track clicked - toggle play/pause
+            handlePlayPause();
         } else {
             // Different track clicked - load it
             playTrack(track);
@@ -372,18 +218,6 @@ export default function Lineup({ lineupData }: LineupProps) {
                                     <p className="text-xs text-muted-foreground truncate">
                                         {track.artists.map((artist) => artist.name).join(", ")}
                                     </p>
-                                    {/* Loading message for both platforms */}
-                                    {isIOS && loadingTrackId === track.id && (
-                                        <p className="text-xs text-blue-500 mt-1">
-                                            Loading track...
-                                        </p>
-                                    )}
-                                    {/* iOS-specific ready message */}
-                                    {isIOS && readyTrackId === track.id && (
-                                        <p className="text-xs text-green-500 mt-1">
-                                            Ready to play! Tap to start
-                                        </p>
-                                    )}
                                 </div>
 
                                 {getTrackIcon()}
@@ -549,9 +383,11 @@ export default function Lineup({ lineupData }: LineupProps) {
 
     return (
         <div className="container mx-auto px-4 flex flex-col items-center">
-            <div className="w-0 h-0 overflow-hidden">
-                <div ref={embedRef} />
-            </div>
+            {playerError && (
+                <div className="w-full bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
+                    {playerError}
+                </div>
+            )}
 
             <ToggleGroup
                 type="single"

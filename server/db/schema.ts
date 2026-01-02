@@ -1,4 +1,4 @@
-import { text, date, bigint, timestamp, pgTable, primaryKey } from "drizzle-orm/pg-core";
+import { text, date, bigint, timestamp, pgTable, primaryKey, boolean } from "drizzle-orm/pg-core";
 
 export const stagesTable = pgTable("stages", {
     id: bigint({ mode: "number" }).primaryKey(),
@@ -42,3 +42,15 @@ export const performanceArtists = pgTable(
     },
     (table) => [primaryKey({ columns: [table.performanceId, table.artistId] })]
 );
+
+export const spotifyUsersTable = pgTable("spotify_users", {
+    id: text().primaryKey(),
+    email: text().notNull(),
+    displayName: text(),
+    isPremium: boolean().notNull().default(false),
+    accessToken: text().notNull(),
+    refreshToken: text().notNull(),
+    tokenExpiresAt: timestamp().notNull(),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp().notNull().defaultNow(),
+});
