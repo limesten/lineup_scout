@@ -10,6 +10,7 @@ interface UseSpotifyPlayerReturn {
     playbackState: PlaybackState | null;
     error: string | null;
     play: (spotifyUri: string) => Promise<void>;
+    activateElement: () => void;
 }
 
 export function useSpotifyPlayer(isAuthenticated: boolean): UseSpotifyPlayerReturn {
@@ -99,6 +100,13 @@ export function useSpotifyPlayer(isAuthenticated: boolean): UseSpotifyPlayerRetu
         };
     }, [isAuthenticated]);
 
+    // Call this synchronously on user gesture (click/tap) to unlock audio on iOS
+    const activateElement = useCallback(() => {
+        if (playerRef.current) {
+            playerRef.current.activateElement();
+        }
+    }, []);
+
     const play = useCallback(async (spotifyUri: string) => {
         if (!deviceId) {
             setError('Player not ready');
@@ -143,5 +151,6 @@ export function useSpotifyPlayer(isAuthenticated: boolean): UseSpotifyPlayerRetu
         playbackState,
         error,
         play,
+        activateElement,
     };
 }

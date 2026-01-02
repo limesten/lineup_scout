@@ -37,7 +37,7 @@ export default function Lineup({ lineupData }: LineupProps) {
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
 
     const { isAuthenticated } = useSpotifyAuth();
-    const { player, isReady, playbackState, error: playerError, play } = useSpotifyPlayer(isAuthenticated);
+    const { player, isReady, playbackState, error: playerError, play, activateElement } = useSpotifyPlayer(isAuthenticated);
 
     // Derive playing state from SDK playback state
     const isPlaying = playbackState !== null && !playbackState.paused;
@@ -119,6 +119,9 @@ export default function Lineup({ lineupData }: LineupProps) {
         if (!isAuthenticated) {
             return;
         }
+
+        // Activate element synchronously on user gesture to unlock audio on iOS
+        activateElement();
 
         // Don't allow clicking if track is currently loading
         if (loadingTrackId === track.id) {

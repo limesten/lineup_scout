@@ -1,6 +1,7 @@
 export interface SpotifyPlayer {
     connect(): Promise<boolean>;
     disconnect(): void;
+    activateElement(): Promise<void>;
     addListener(event: 'ready', callback: (data: { device_id: string }) => void): void;
     addListener(event: 'not_ready', callback: (data: { device_id: string }) => void): void;
     addListener(event: 'player_state_changed', callback: (state: PlaybackState | null) => void): void;
