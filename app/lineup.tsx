@@ -1,22 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LINEUP_DATES, Weekend } from "@/lib/lineup-settings";
-import { X } from "lucide-react";
+import { X, LayoutGrid, CalendarDays } from "lucide-react";
 
 import type {
     SpotifyIframeApi,
     SpotifyEmbedController,
 } from "@/lib/spotify-types";
 import { CompleteLineup, LineupPerformance } from "@/lib/db-types";
+import { TimeTableView } from "./components/timetable";
+import { transformToTimeTableData } from "@/lib/timetable-utils";
 
 interface LineupProps {
     lineupData: CompleteLineup;
 }
 
+type ViewMode = "timetable" | "grid";
+
+const STAGE_ORDER = [
+    "MAINSTAGE",
+    "THE RAVE CAVE",
+    "CORE",
+    "HOUSE OF FORTUNE BY JBL",
+    "FREEDOM BY BUD",
+    "CAGE",
+    "CRYSTAL GARDEN",
+    "MELODIA BY CORONA",
+    "THE ROSE GARDEN",
+    "RISE BY COCA-COLA",
+    "THE GREAT LIBRARY",
+    "ELIXIR",
+    "PLANAXIS",
+    "ATMOSPHERE",
+    "MOOSEBAR",
+];
+
 export default function Lineup({ lineupData }: LineupProps) {
+    const [viewMode, setViewMode] = useState<ViewMode>("timetable");
     const [selectedWeekend, setSelectedWeekend] = useState<Weekend>("WEEKEND_1");
     const [selectedDate, setSelectedDate] = useState<string | null>(LINEUP_DATES.WEEKEND_1[0]);
     const [selectedArtist, setSelectedArtist] = useState<{ name: string; spotifyId: string } | null>(null);
@@ -173,10 +196,10 @@ export default function Lineup({ lineupData }: LineupProps) {
         );
     }
 
-    function getStagesByDate(date: string) {
-        if (!date) return {};
+    const getPerformancesByDate = useCallback((date: string): LineupPerformance[] => {
+        if (!date) return [];
 
-        const dayPerformances = lineupData[selectedWeekend].filter((performance) => {
+        return lineupData[selectedWeekend].filter((performance) => {
             // Convert UTC startTime to CEST to determine festival day
             const startTimeUTC = new Date(performance.startTime);
             const startTimeCEST = new Intl.DateTimeFormat("sv-SE", {
@@ -209,6 +232,11 @@ export default function Lineup({ lineupData }: LineupProps) {
 
             return festivalDate === date;
         });
+    }, [lineupData, selectedWeekend]);
+
+    function getStagesByDate(date: string) {
+        const dayPerformances = getPerformancesByDate(date);
+        if (dayPerformances.length === 0) return {};
 
         const groupedByStage: { [stageName: string]: LineupPerformance[] } = {};
 
@@ -220,27 +248,9 @@ export default function Lineup({ lineupData }: LineupProps) {
             groupedByStage[stageName].push(performance);
         });
 
-        const stageOrder = [
-            "MAINSTAGE",
-            "THE RAVE CAVE",
-            "CORE",
-            "HOUSE OF FORTUNE BY JBL",
-            "FREEDOM BY BUD",
-            "CAGE",
-            "CRYSTAL GARDEN",
-            "MELODIA BY CORONA",
-            "THE ROSE GARDEN",
-            "RISE BY COCA-COLA",
-            "THE GREAT LIBRARY",
-            "ELIXIR",
-            "PLANAXIS",
-            "ATMOSPHERE",
-            "MOOSEBAR",
-        ];
-
         const sortedStageNames = Object.keys(groupedByStage).sort((stageNameA, stageNameB) => {
-            const priorityA = stageOrder.indexOf(stageNameA);
-            const priorityB = stageOrder.indexOf(stageNameB);
+            const priorityA = STAGE_ORDER.indexOf(stageNameA);
+            const priorityB = STAGE_ORDER.indexOf(stageNameB);
 
             const finalPriorityA = priorityA === -1 ? 999 : priorityA;
             const finalPriorityB = priorityB === -1 ? 999 : priorityB;
@@ -256,21 +266,47 @@ export default function Lineup({ lineupData }: LineupProps) {
         return orderedGroupedByStage;
     }
 
+    // Memoized time table data transformation
+    const timeTableData = useMemo(() => {
+        if (!selectedDate) return null;
+        const performances = getPerformancesByDate(selectedDate);
+        if (performances.length === 0) return null;
+        return transformToTimeTableData(performances, STAGE_ORDER);
+    }, [selectedDate, getPerformancesByDate]);
+
     return (
         <div className="container mx-auto px-4 flex flex-col items-center">
-            <ToggleGroup
-                type="single"
-                value={selectedWeekend}
-                onValueChange={handleWeekendChange}
-                className="mb-2"
-            >
-                <ToggleGroupItem variant="outline" value="WEEKEND_1" className="cursor-pointer">
-                    Weekend 1
-                </ToggleGroupItem>
-                <ToggleGroupItem variant="outline" value="WEEKEND_2" className="cursor-pointer">
-                    Weekend 2
-                </ToggleGroupItem>
-            </ToggleGroup>
+            <div className="flex flex-wrap gap-4 items-center justify-center mb-2">
+                {/* Weekend Toggle */}
+                <ToggleGroup
+                    type="single"
+                    value={selectedWeekend}
+                    onValueChange={handleWeekendChange}
+                >
+                    <ToggleGroupItem variant="outline" value="WEEKEND_1" className="cursor-pointer">
+                        Weekend 1
+                    </ToggleGroupItem>
+                    <ToggleGroupItem variant="outline" value="WEEKEND_2" className="cursor-pointer">
+                        Weekend 2
+                    </ToggleGroupItem>
+                </ToggleGroup>
+
+                {/* View Mode Toggle */}
+                <ToggleGroup
+                    type="single"
+                    value={viewMode}
+                    onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                >
+                    <ToggleGroupItem variant="outline" value="timetable" className="cursor-pointer">
+                        <CalendarDays className="h-4 w-4 mr-1" />
+                        Timetable
+                    </ToggleGroupItem>
+                    <ToggleGroupItem variant="outline" value="grid" className="cursor-pointer">
+                        <LayoutGrid className="h-4 w-4 mr-1" />
+                        Grid
+                    </ToggleGroupItem>
+                </ToggleGroup>
+            </div>
 
             <ToggleGroup type="single" value={selectedDate || ""} onValueChange={setSelectedDate}>
                 {LINEUP_DATES[selectedWeekend].map((date) => (
@@ -286,28 +322,41 @@ export default function Lineup({ lineupData }: LineupProps) {
             </ToggleGroup>
 
             {/* Main content with bottom padding when player is open */}
-            <div className={`columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-5 w-[80%] ${selectedArtist ? "pb-[400px]" : ""}`}>
-                {selectedDate &&
-                    Object.entries(getStagesByDate(selectedDate)).map(
-                        ([stageName, performances]) => (
-                            <Card key={stageName} className="mb-6 text-center break-inside-avoid">
-                                <CardHeader>
-                                    <CardTitle>
-                                        <span>{stageName}</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-1">
-                                        {performances.map((performance) => (
-                                            <li key={performance.id} className="mt-2">
-                                                {Performance(performance)}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        )
-                    )}
+            <div className={`mt-5 w-full ${selectedArtist ? "pb-[400px]" : ""}`}>
+                {/* Timetable View */}
+                {viewMode === "timetable" && timeTableData && (
+                    <TimeTableView
+                        data={timeTableData}
+                        onArtistClick={handleArtistClick}
+                    />
+                )}
+
+                {/* Grid View */}
+                {viewMode === "grid" && (
+                    <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 mx-auto w-[80%]">
+                        {selectedDate &&
+                            Object.entries(getStagesByDate(selectedDate)).map(
+                                ([stageName, performances]) => (
+                                    <Card key={stageName} className="mb-6 text-center break-inside-avoid">
+                                        <CardHeader>
+                                            <CardTitle>
+                                                <span>{stageName}</span>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ul className="space-y-1">
+                                                {performances.map((performance) => (
+                                                    <li key={performance.id} className="mt-2">
+                                                        {Performance(performance)}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </CardContent>
+                                    </Card>
+                                )
+                            )}
+                    </div>
+                )}
             </div>
 
             {/* Fixed bottom Spotify player */}
