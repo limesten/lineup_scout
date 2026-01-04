@@ -7,11 +7,19 @@ import {
     performanceTable,
     performanceArtists,
 } from "@/server/db/schema";
-import { ALL_DATES, getWeekendForData } from "@/lib/lineup-settings";
+import { getAllDatesForYear, getLineupDates, Year } from "@/lib/lineup-settings";
 import { eq, inArray, desc } from "drizzle-orm";
 import type { Artist, CompleteLineup, LineupPerformance } from "@/lib/db-types";
 
-export async function getCompleteLineup(): Promise<CompleteLineup> {
+export async function getCompleteLineup(year: Year = 2025): Promise<CompleteLineup> {
+    const allDatesForYear = getAllDatesForYear(year);
+    const lineupDates = getLineupDates(year);
+
+    // If no dates for this year, return empty structure
+    if (allDatesForYear.length === 0) {
+        return { WEEKEND_1: [], WEEKEND_2: [] };
+    }
+
     const performanceData = await db
         .select({
             performance: performanceTable,
@@ -19,10 +27,15 @@ export async function getCompleteLineup(): Promise<CompleteLineup> {
         })
         .from(performanceTable)
         .innerJoin(stagesTable, eq(performanceTable.stageId, stagesTable.id))
-        .where(inArray(performanceTable.date, ALL_DATES))
+        .where(inArray(performanceTable.date, allDatesForYear))
         .orderBy(desc(performanceTable.startTime));
 
     const performanceIds = performanceData.map((p) => p.performance.id);
+
+    // If no performances found, return empty structure
+    if (performanceIds.length === 0) {
+        return { WEEKEND_1: [], WEEKEND_2: [] };
+    }
 
     const artistData = await db
         .select({
@@ -47,8 +60,19 @@ export async function getCompleteLineup(): Promise<CompleteLineup> {
         WEEKEND_2: [],
     };
 
+    // Helper to determine which weekend a date belongs to for this year
+    function getWeekendForDate(date: string): "WEEKEND_1" | "WEEKEND_2" | null {
+        if (lineupDates.WEEKEND_1.includes(date)) {
+            return "WEEKEND_1";
+        }
+        if (lineupDates.WEEKEND_2.includes(date)) {
+            return "WEEKEND_2";
+        }
+        return null;
+    }
+
     performanceData.forEach(({ performance, stage }) => {
-        const weekend = getWeekendForData(performance.date);
+        const weekend = getWeekendForDate(performance.date);
         if (!weekend) return;
 
         const lineupPerformance: LineupPerformance = {

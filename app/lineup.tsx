@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LINEUP_DATES, Weekend } from "@/lib/lineup-settings";
+import { AVAILABLE_YEARS, Year, getLineupDates, Weekend } from "@/lib/lineup-settings";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { X, LayoutGrid, CalendarDays } from "lucide-react";
 
 import type {
@@ -15,7 +22,7 @@ import { TimeTableView } from "./components/timetable";
 import { transformToTimeTableData } from "@/lib/timetable-utils";
 
 interface LineupProps {
-    lineupData: CompleteLineup;
+    allLineupData: Record<Year, CompleteLineup>;
 }
 
 type ViewMode = "timetable" | "grid";
@@ -38,10 +45,17 @@ const STAGE_ORDER = [
     "MOOSEBAR",
 ];
 
-export default function Lineup({ lineupData }: LineupProps) {
+export default function Lineup({ allLineupData }: LineupProps) {
+    const [selectedYear, setSelectedYear] = useState<Year>(2025);
     const [viewMode, setViewMode] = useState<ViewMode>("timetable");
     const [selectedWeekend, setSelectedWeekend] = useState<Weekend>("WEEKEND_1");
-    const [selectedDate, setSelectedDate] = useState<string | null>(LINEUP_DATES.WEEKEND_1[0]);
+
+    // Get dates and data dynamically based on selected year
+    const lineupDatesForYear = getLineupDates(selectedYear);
+    const lineupData = allLineupData[selectedYear];
+    const hasLineupData = lineupData.WEEKEND_1.length > 0 || lineupData.WEEKEND_2.length > 0;
+
+    const [selectedDate, setSelectedDate] = useState<string | null>(lineupDatesForYear.WEEKEND_1[0] || null);
     const [selectedArtist, setSelectedArtist] = useState<{ name: string; spotifyId: string } | null>(null);
 
     const embedRef = useRef<HTMLDivElement>(null);
@@ -115,9 +129,18 @@ export default function Lineup({ lineupData }: LineupProps) {
             return;
         }
         setSelectedWeekend(newWeekend);
-        const firstDate = LINEUP_DATES[newWeekend][0];
+        const firstDate = lineupDatesForYear[newWeekend][0] || null;
         setSelectedDate(firstDate);
     };
+
+    function handleYearChange(year: string) {
+        const newYear = parseInt(year) as Year;
+        setSelectedYear(newYear);
+        // Reset to first weekend and date for the new year
+        setSelectedWeekend("WEEKEND_1");
+        const newDates = getLineupDates(newYear);
+        setSelectedDate(newDates.WEEKEND_1[0] || null);
+    }
 
     function handleArtistClick(spotifyUrl: string | null, artistName: string) {
         if (!spotifyUrl || spotifyUrl.trim() === "") {
@@ -276,9 +299,28 @@ export default function Lineup({ lineupData }: LineupProps) {
 
     return (
         <div className="container mx-auto px-4 flex flex-col items-center">
-            <div className="flex flex-wrap gap-4 items-center justify-center mb-2">
-                {/* Weekend Toggle */}
-                <ToggleGroup
+            {/* Year Dropdown */}
+            <div className="mb-4">
+                <Select value={selectedYear.toString()} onValueChange={handleYearChange}>
+                    <SelectTrigger className="w-24">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {AVAILABLE_YEARS.map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                                {year}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Show controls and content only if year has data */}
+            {hasLineupData ? (
+                <>
+                    <div className="flex flex-wrap gap-4 items-center justify-center mb-2">
+                        {/* Weekend Toggle */}
+                        <ToggleGroup
                     type="single"
                     value={selectedWeekend}
                     onValueChange={handleWeekendChange}
@@ -297,19 +339,19 @@ export default function Lineup({ lineupData }: LineupProps) {
                     value={viewMode}
                     onValueChange={(value) => value && setViewMode(value as ViewMode)}
                 >
-                    <ToggleGroupItem variant="outline" value="timetable" className="cursor-pointer">
-                        <CalendarDays className="h-4 w-4 mr-1" />
+                    <ToggleGroupItem variant="outline" value="timetable" className="cursor-pointer px-4">
+                        <CalendarDays className="h-4 w-4 mr-2" />
                         Timetable
                     </ToggleGroupItem>
-                    <ToggleGroupItem variant="outline" value="grid" className="cursor-pointer">
-                        <LayoutGrid className="h-4 w-4 mr-1" />
+                    <ToggleGroupItem variant="outline" value="grid" className="cursor-pointer px-4">
+                        <LayoutGrid className="h-4 w-4 mr-2" />
                         Grid
                     </ToggleGroupItem>
                 </ToggleGroup>
             </div>
 
             <ToggleGroup type="single" value={selectedDate || ""} onValueChange={setSelectedDate}>
-                {LINEUP_DATES[selectedWeekend].map((date) => (
+                {lineupDatesForYear[selectedWeekend].map((date: string) => (
                     <ToggleGroupItem
                         key={date}
                         variant="outline"
@@ -375,6 +417,14 @@ export default function Lineup({ lineupData }: LineupProps) {
                         {/* Spotify embed container */}
                         <div ref={embedRef} className="w-full" />
                     </div>
+                </div>
+            )}
+                </>
+            ) : (
+                /* Empty state for years without data */
+                <div className="text-center py-20 text-muted-foreground">
+                    <p className="text-lg">Lineup for {selectedYear} has not been released yet.</p>
+                    <p>Check back later!</p>
                 </div>
             )}
         </div>
