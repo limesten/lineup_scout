@@ -138,7 +138,7 @@ export function ArtistPlayer({
                                 activeTab === 'spotify' ? 'block' : 'none',
                         }}
                     >
-                        <div ref={embedRef} className="w-full bg-[#121212] rounded-xl overflow-hidden" />
+                        <div ref={embedRef} className="w-full" />
                     </TabsContent>
 
                     <TabsContent value="youtube" className="mt-0">
