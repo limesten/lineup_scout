@@ -29,6 +29,7 @@
     width: string | number;
     height: string | number;
     uri?: string;
+    theme?: string;
   }
   
   /**

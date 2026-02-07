@@ -65,6 +65,7 @@ export function ArtistPlayer({
                 width: '100%',
                 height: '352',
                 uri: `spotify:artist:${spotifyId}`,
+                theme: 'dark',
             },
             (controller: SpotifyEmbedController) => {
                 controller.addListener('ready', () => setPlayerLoaded(true));
@@ -138,7 +139,9 @@ export function ArtistPlayer({
                                 activeTab === 'spotify' ? 'block' : 'none',
                         }}
                     >
-                        <div ref={embedRef} className="w-full" />
+                        <div style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                            <div ref={embedRef} className="w-full" />
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="youtube" className="mt-0">
