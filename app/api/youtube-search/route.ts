@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
     try {
         const query = encodeURIComponent(`${artistName} live set`);
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=5&key=${apiKey}`;
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=15&key=${apiKey}`;
 
         const response = await fetch(url);
 
@@ -31,7 +31,13 @@ export async function GET(request: Request) {
         }
 
         const data = await response.json();
-        const items = data.items || [];
+        const allItems = data.items || [];
+        const artistLower = artistName.toLowerCase();
+        const items = allItems
+            .filter((item: { snippet: { title: string } }) =>
+                item.snippet.title.toLowerCase().includes(artistLower)
+            )
+            .slice(0, 5);
         setCachedResults(artistName, items);
         return NextResponse.json({ items });
     } catch (err) {
