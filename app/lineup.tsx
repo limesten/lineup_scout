@@ -19,7 +19,7 @@ import type {
 } from "@/lib/spotify-types";
 import { CompleteLineup, LineupPerformance } from "@/lib/db-types";
 import { TimeTableView } from "./components/timetable";
-import { transformToTimeTableData } from "@/lib/timetable-utils";
+import { transformToTimeTableData, isPlaceholderTime } from "@/lib/timetable-utils";
 
 interface LineupProps {
     allLineupData: Record<Year, CompleteLineup>;
@@ -212,9 +212,11 @@ export default function Lineup({ allLineupData }: LineupProps) {
                         </span>
                     ))}
                 </span>
-                <span className="text-xs">
-                    {formatCESTTime(performance.startTime)} - {formatCESTTime(performance.endTime)}
-                </span>
+                {!isPlaceholderTime(performance.startTime, performance.endTime) && (
+                    <span className="text-xs">
+                        {formatCESTTime(performance.startTime)} - {formatCESTTime(performance.endTime)}
+                    </span>
+                )}
             </div>
         );
     }
@@ -289,12 +291,21 @@ export default function Lineup({ allLineupData }: LineupProps) {
         return orderedGroupedByStage;
     }
 
-    // Memoized time table data transformation
+    // Memoized time table data transformation (excludes placeholder performances)
     const timeTableData = useMemo(() => {
         if (!selectedDate) return null;
-        const performances = getPerformancesByDate(selectedDate);
+        const performances = getPerformancesByDate(selectedDate)
+            .filter(p => !isPlaceholderTime(p.startTime, p.endTime));
         if (performances.length === 0) return null;
         return transformToTimeTableData(performances, STAGE_ORDER);
+    }, [selectedDate, getPerformancesByDate]);
+
+    // Detect when performances exist but all have placeholder times
+    const showTimesNotReleasedMessage = useMemo(() => {
+        if (!selectedDate) return false;
+        const performances = getPerformancesByDate(selectedDate);
+        if (performances.length === 0) return false;
+        return performances.every(p => isPlaceholderTime(p.startTime, p.endTime));
     }, [selectedDate, getPerformancesByDate]);
 
     return (
@@ -366,6 +377,11 @@ export default function Lineup({ allLineupData }: LineupProps) {
             {/* Main content with bottom padding when player is open */}
             <div className={`mt-5 w-full ${selectedArtist ? "pb-[400px]" : ""}`}>
                 {/* Timetable View */}
+                {viewMode === "timetable" && showTimesNotReleasedMessage && (
+                    <p className="text-center text-muted-foreground mt-8">
+                        Set times have not been released yet — check back later!
+                    </p>
+                )}
                 {viewMode === "timetable" && timeTableData && (
                     <TimeTableView
                         data={timeTableData}

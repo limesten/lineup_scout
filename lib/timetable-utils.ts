@@ -33,6 +33,21 @@ export function getMinutesFromMidnight(isoString: string): number {
 }
 
 /**
+ * Check if a performance has placeholder times (12:00-12:01 CEST),
+ * indicating that real set times have not been released yet.
+ */
+export function isPlaceholderTime(startTime: string, endTime: string): boolean {
+    const fmt = (iso: string) =>
+        new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Europe/Stockholm",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        }).format(new Date(iso));
+    return fmt(startTime) === "12:00" && fmt(endTime) === "12:01";
+}
+
+/**
  * Format minutes from midnight to HH:MM string
  */
 export function formatMinutesToTime(minutes: number): string {
