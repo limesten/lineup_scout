@@ -15,7 +15,7 @@ export function TimeTableStageRow({ stage, timeRange, onArtistClick }: TimeTable
 
     return (
         <div className="flex h-14 md:h-16 border-b border-border">
-            <StageLabel name={stage.name} />
+            <StageLabel name={stage.name} stageHost={stage.stageHost} />
             <div className="flex-1 relative">
                 {/* Grid lines for hours */}
                 <div className="absolute inset-0 flex pointer-events-none">

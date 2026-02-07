@@ -6,6 +6,7 @@ import {
     stagesTable,
     performanceTable,
     performanceArtists,
+    stageHostsTable,
 } from "@/server/db/schema";
 import { getAllDatesForYear, getLineupDates, Year } from "@/lib/lineup-settings";
 import { eq, inArray, desc } from "drizzle-orm";
@@ -46,6 +47,22 @@ export async function getCompleteLineup(year: Year = 2025): Promise<CompleteLine
         .innerJoin(artistsTable, eq(performanceArtists.artistId, artistsTable.id))
         .where(inArray(performanceArtists.performanceId, performanceIds));
 
+    // Fetch stage hosts for the relevant dates
+    const stageHostData = await db
+        .select({
+            stageId: stageHostsTable.stageId,
+            date: stageHostsTable.date,
+            stageHost: stageHostsTable.stageHost,
+        })
+        .from(stageHostsTable)
+        .where(inArray(stageHostsTable.date, allDatesForYear));
+
+    // Build lookup map: "stageId-date" → stageHost
+    const stageHostMap = new Map<string, string>();
+    stageHostData.forEach(({ stageId, date, stageHost }) => {
+        stageHostMap.set(`${stageId}-${date}`, stageHost);
+    });
+
     // Group the artists that belong to the same performance
     const artistsByPerformance = new Map<number, Artist[]>();
     artistData.forEach(({ performanceId, artist }) => {
@@ -80,6 +97,7 @@ export async function getCompleteLineup(year: Year = 2025): Promise<CompleteLine
             name: performance.name,
             artists: artistsByPerformance.get(performance.id) || [],
             stage: stage,
+            stageHost: stageHostMap.get(`${stage.id}-${performance.date}`) ?? null,
             date: performance.date,
             day: performance.day,
             startTime: performance.startTime,

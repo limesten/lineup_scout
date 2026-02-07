@@ -12,8 +12,13 @@ shadcn UI
 next.js
 tailwindcss
 postgres with neon
+drizzle ORM
 vercel
 
 # Architecture Notes
 
 Use shadcn UI components whenever possible. Before creating a new component, search if shadcn ui component can be imported instead.
+
+# Rules
+
+Run pnpm run build before finishing to make sure there are no build errors.

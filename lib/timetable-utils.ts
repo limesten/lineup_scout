@@ -176,6 +176,7 @@ export function transformToTimeTableData(
         return {
             id: stageData.stage.id,
             name: stageName,
+            stageHost: stageData.performances[0]?.stageHost ?? null,
             performances: timeTablePerformances,
         };
     });

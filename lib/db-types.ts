@@ -11,6 +11,7 @@ export interface LineupPerformance {
     name: string;
     artists: Artist[];
     stage: Stage;
+    stageHost: string | null;
     date: string;
     day: string;
     startTime: string;
@@ -39,6 +40,7 @@ export interface TimeTablePerformance extends LineupPerformance {
 export interface TimeTableStage {
     id: number;
     name: string;
+    stageHost: string | null;
     performances: TimeTablePerformance[];
 }
 

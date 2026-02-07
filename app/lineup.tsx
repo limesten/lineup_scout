@@ -211,14 +211,22 @@ export default function Lineup({ allLineupData }: LineupProps) {
         const dayPerformances = getPerformancesByDate(date);
         if (dayPerformances.length === 0) return {};
 
-        const groupedByStage: { [stageName: string]: LineupPerformance[] } = {};
+        const groupedByStage: {
+            [stageName: string]: {
+                stageHost: string | null;
+                performances: LineupPerformance[];
+            };
+        } = {};
 
         dayPerformances.forEach((performance) => {
             const stageName = performance.stage.name;
             if (!groupedByStage[stageName]) {
-                groupedByStage[stageName] = [];
+                groupedByStage[stageName] = {
+                    stageHost: performance.stageHost,
+                    performances: [],
+                };
             }
-            groupedByStage[stageName].push(performance);
+            groupedByStage[stageName].performances.push(performance);
         });
 
         const sortedStageNames = Object.keys(groupedByStage).sort(
@@ -234,7 +242,10 @@ export default function Lineup({ allLineupData }: LineupProps) {
         );
 
         const orderedGroupedByStage: {
-            [stageName: string]: LineupPerformance[];
+            [stageName: string]: {
+                stageHost: string | null;
+                performances: LineupPerformance[];
+            };
         } = {};
         sortedStageNames.forEach((stageName) => {
             orderedGroupedByStage[stageName] = groupedByStage[stageName];
@@ -383,36 +394,47 @@ export default function Lineup({ allLineupData }: LineupProps) {
                                 {selectedDate &&
                                     Object.entries(
                                         getStagesByDate(selectedDate),
-                                    ).map(([stageName, performances]) => (
-                                        <Card
-                                            key={stageName}
-                                            className="mb-6 text-center break-inside-avoid"
-                                        >
-                                            <CardHeader>
-                                                <CardTitle>
-                                                    <span>{stageName}</span>
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <ul className="space-y-1">
-                                                    {performances.map(
-                                                        (performance) => (
-                                                            <li
-                                                                key={
-                                                                    performance.id
-                                                                }
-                                                                className="mt-2"
-                                                            >
-                                                                {Performance(
-                                                                    performance,
-                                                                )}
-                                                            </li>
-                                                        ),
+                                    ).map(
+                                        ([
+                                            stageName,
+                                            { stageHost, performances },
+                                        ]) => (
+                                            <Card
+                                                key={stageName}
+                                                className="mb-6 text-center break-inside-avoid"
+                                            >
+                                                <CardHeader>
+                                                    <CardTitle>
+                                                        <span>{stageName}</span>
+                                                    </CardTitle>
+                                                    {stageHost && (
+                                                        <p className="italic text-sm text-muted-foreground">
+                                                            HOSTED BY:{' '}
+                                                            {stageHost}
+                                                        </p>
                                                     )}
-                                                </ul>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <ul className="space-y-1">
+                                                        {performances.map(
+                                                            (performance) => (
+                                                                <li
+                                                                    key={
+                                                                        performance.id
+                                                                    }
+                                                                    className="mt-2"
+                                                                >
+                                                                    {Performance(
+                                                                        performance,
+                                                                    )}
+                                                                </li>
+                                                            ),
+                                                        )}
+                                                    </ul>
+                                                </CardContent>
+                                            </Card>
+                                        ),
+                                    )}
                             </div>
                         )}
                     </div>

@@ -42,3 +42,15 @@ export const performanceArtists = pgTable(
     },
     (table) => [primaryKey({ columns: [table.performanceId, table.artistId] })]
 );
+
+export const stageHostsTable = pgTable(
+    "stage_hosts",
+    {
+        stageId: bigint({ mode: "number" })
+            .notNull()
+            .references(() => stagesTable.id),
+        date: text().notNull(),
+        stageHost: text().notNull(),
+    },
+    (table) => [primaryKey({ columns: [table.stageId, table.date] })]
+);
