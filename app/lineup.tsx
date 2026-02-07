@@ -67,7 +67,7 @@ export default function Lineup({ allLineupData }: LineupProps) {
     );
     const [selectedArtist, setSelectedArtist] = useState<{
         name: string;
-        spotifyId: string;
+        spotifyId: string | null;
     } | null>(null);
 
     const handleWeekendChange = (newWeekend: Weekend) => {
@@ -89,14 +89,13 @@ export default function Lineup({ allLineupData }: LineupProps) {
     }
 
     function handleArtistClick(spotifyUrl: string | null, artistName: string) {
-        if (!spotifyUrl || spotifyUrl.trim() === '') {
-            return;
-        }
+        let artistId: string | null = null;
 
-        // Extract artist ID from Spotify URL
-        const url = new URL(spotifyUrl);
-        const pathSegments = url.pathname.split('/').filter(Boolean);
-        const artistId = pathSegments[pathSegments.length - 1];
+        if (spotifyUrl && spotifyUrl.trim() !== '') {
+            const url = new URL(spotifyUrl);
+            const pathSegments = url.pathname.split('/').filter(Boolean);
+            artistId = pathSegments[pathSegments.length - 1];
+        }
 
         setSelectedArtist({ name: artistName, spotifyId: artistId });
     }

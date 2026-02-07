@@ -11,7 +11,7 @@ import type {
 
 interface ArtistPlayerProps {
     artistName: string;
-    spotifyId: string;
+    spotifyId: string | null;
     onClose: () => void;
 }
 
@@ -53,9 +53,7 @@ export function ArtistPlayer({
         if (!iFrameAPI || !embedRef.current || !spotifyId) return;
 
         if (spotifyControllerRef.current && playerLoaded) {
-            spotifyControllerRef.current.loadUri(
-                `spotify:artist:${spotifyId}`,
-            );
+            spotifyControllerRef.current.loadUri(`spotify:artist:${spotifyId}`);
             return;
         }
 
@@ -135,13 +133,20 @@ export function ArtistPlayer({
                         className="mt-0"
                         forceMount
                         style={{
-                            display:
-                                activeTab === 'spotify' ? 'block' : 'none',
+                            display: activeTab === 'spotify' ? 'block' : 'none',
                         }}
                     >
-                        <div style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                            <div ref={embedRef} className="w-full" />
-                        </div>
+                        {spotifyId ? (
+                            <div
+                                style={{ borderRadius: '12px', overflow: 'hidden' }}
+                            >
+                                <div ref={embedRef} className="w-full" />
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center h-[352px] text-muted-foreground">
+                                No Spotify results found for &ldquo;{artistName}&rdquo;, try the YouTube tab instead!
+                            </div>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="youtube" className="mt-0">
