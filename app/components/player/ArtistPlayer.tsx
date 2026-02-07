@@ -146,13 +146,16 @@ export function ArtistPlayer({
                             display: activeTab === 'spotify' ? 'block' : 'none',
                         }}
                     >
-                        {spotifyId ? (
-                            <div
-                                style={{ borderRadius: '12px', overflow: 'hidden' }}
-                            >
-                                <div ref={embedRef} className="w-full" />
-                            </div>
-                        ) : (
+                        <div
+                            style={{
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                display: spotifyId ? 'block' : 'none',
+                            }}
+                        >
+                            <div ref={embedRef} className="w-full" />
+                        </div>
+                        {!spotifyId && (
                             <div className="flex items-center justify-center h-[352px] text-muted-foreground">
                                 No Spotify results found for &ldquo;{artistName}&rdquo;, try the YouTube tab instead!
                             </div>
