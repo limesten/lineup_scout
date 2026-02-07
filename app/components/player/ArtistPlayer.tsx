@@ -9,6 +9,10 @@ import type {
     SpotifyEmbedController,
 } from '@/lib/spotify-types';
 
+// Module-level cache — survives component unmount/remount
+let cachedSpotifyApi: SpotifyIframeApi | null = null;
+let scriptLoaded = false;
+
 interface ArtistPlayerProps {
     artistName: string;
     spotifyId: string | null;
@@ -20,30 +24,36 @@ export function ArtistPlayer({
     spotifyId,
     onClose,
 }: ArtistPlayerProps) {
-    const [activeTab, setActiveTab] = useState<string>('spotify');
+    const [activeTab, setActiveTab] = useState<string>('youtube');
     const embedRef = useRef<HTMLDivElement>(null);
     const spotifyControllerRef = useRef<SpotifyEmbedController | null>(null);
     const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(
-        undefined,
+        cachedSpotifyApi ?? undefined,
     );
     const [playerLoaded, setPlayerLoaded] = useState(false);
 
-    // Load Spotify iframe API script
+    // Load Spotify iframe API script (once globally)
     useEffect(() => {
+        if (scriptLoaded) return;
+        scriptLoaded = true;
+
         const script = document.createElement('script');
         script.src = 'https://open.spotify.com/embed/iframe-api/v1';
         script.async = true;
         document.body.appendChild(script);
-        return () => {
-            document.body.removeChild(script);
-        };
     }, []);
 
     // Set up global callback for Spotify iframe API
     useEffect(() => {
         if (iFrameAPI) return;
 
+        if (cachedSpotifyApi) {
+            setIFrameAPI(cachedSpotifyApi);
+            return;
+        }
+
         window.onSpotifyIframeApiReady = (api: SpotifyIframeApi) => {
+            cachedSpotifyApi = api;
             setIFrameAPI(api);
         };
     }, [iFrameAPI]);
@@ -112,18 +122,18 @@ export function ArtistPlayer({
                         </p>
                         <TabsList>
                             <TabsTrigger
-                                value="spotify"
-                                className="gap-1.5 cursor-pointer"
-                            >
-                                <Music className="w-3.5 h-3.5" />
-                                Spotify
-                            </TabsTrigger>
-                            <TabsTrigger
                                 value="youtube"
                                 className="gap-1.5 cursor-pointer"
                             >
                                 <Video className="w-3.5 h-3.5" />
                                 YouTube
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="spotify"
+                                className="gap-1.5 cursor-pointer"
+                            >
+                                <Music className="w-3.5 h-3.5" />
+                                Spotify
                             </TabsTrigger>
                         </TabsList>
                     </div>
