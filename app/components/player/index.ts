@@ -1,0 +1,1 @@
+export { ArtistPlayer } from './ArtistPlayer';

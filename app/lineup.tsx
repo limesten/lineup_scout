@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -16,14 +16,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { X, LayoutGrid, CalendarDays } from 'lucide-react';
+import { LayoutGrid, CalendarDays } from 'lucide-react';
 
-import type {
-    SpotifyIframeApi,
-    SpotifyEmbedController,
-} from '@/lib/spotify-types';
 import { CompleteLineup, LineupPerformance } from '@/lib/db-types';
 import { TimeTableView } from './components/timetable';
+import { ArtistPlayer } from './components/player';
 import {
     transformToTimeTableData,
     isPlaceholderTime,
@@ -73,78 +70,6 @@ export default function Lineup({ allLineupData }: LineupProps) {
         spotifyId: string;
     } | null>(null);
 
-    const embedRef = useRef<HTMLDivElement>(null);
-    const spotifyEmbedControllerRef = useRef<SpotifyEmbedController | null>(
-        null,
-    );
-    const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(
-        undefined,
-    );
-    const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
-
-    // Load Spotify iframe API script
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = 'https://open.spotify.com/embed/iframe-api/v1';
-        script.async = true;
-        document.body.appendChild(script);
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
-
-    // Set up global callback for Spotify iframe API
-    useEffect(() => {
-        if (iFrameAPI) {
-            return;
-        }
-
-        window.onSpotifyIframeApiReady = (
-            SpotifyIframeApi: SpotifyIframeApi,
-        ) => {
-            setIFrameAPI(SpotifyIframeApi);
-        };
-    }, [iFrameAPI]);
-
-    // Initialize the Spotify player when API is ready and we have an artist selected
-    useEffect(() => {
-        if (!iFrameAPI || !embedRef.current || !selectedArtist) {
-            return;
-        }
-
-        // If player already exists, just load the new URI
-        if (spotifyEmbedControllerRef.current && playerLoaded) {
-            const artistUri = `spotify:artist:${selectedArtist.spotifyId}`;
-            spotifyEmbedControllerRef.current.loadUri(artistUri);
-            return;
-        }
-
-        // Create new controller
-        const artistUri = `spotify:artist:${selectedArtist.spotifyId}`;
-
-        iFrameAPI.createController(
-            embedRef.current,
-            {
-                width: '100%',
-                height: '352',
-                uri: artistUri,
-            },
-            (spotifyEmbedController: SpotifyEmbedController) => {
-                spotifyEmbedController.addListener('ready', () => {
-                    setPlayerLoaded(true);
-                });
-
-                spotifyEmbedControllerRef.current = spotifyEmbedController;
-            },
-        );
-
-        return () => {
-            if (spotifyEmbedControllerRef.current) {
-                spotifyEmbedControllerRef.current.removeListener('ready');
-            }
-        };
-    }, [iFrameAPI, selectedArtist, playerLoaded]);
-
     const handleWeekendChange = (newWeekend: Weekend) => {
         if (!newWeekend) {
             return;
@@ -174,15 +99,6 @@ export default function Lineup({ allLineupData }: LineupProps) {
         const artistId = pathSegments[pathSegments.length - 1];
 
         setSelectedArtist({ name: artistName, spotifyId: artistId });
-    }
-
-    function handleClosePlayer() {
-        if (spotifyEmbedControllerRef.current) {
-            spotifyEmbedControllerRef.current.pause();
-        }
-        setSelectedArtist(null);
-        setPlayerLoaded(false);
-        spotifyEmbedControllerRef.current = null;
     }
 
     function formatDate(date: string) {
@@ -445,7 +361,7 @@ export default function Lineup({ allLineupData }: LineupProps) {
 
                     {/* Main content with bottom padding when player is open */}
                     <div
-                        className={`mt-5 w-full ${selectedArtist ? 'pb-[400px]' : ''}`}
+                        className={`mt-5 w-full ${selectedArtist ? 'pb-[440px]' : ''}`}
                     >
                         {/* Timetable View */}
                         {viewMode === 'timetable' &&
@@ -502,23 +418,13 @@ export default function Lineup({ allLineupData }: LineupProps) {
                         )}
                     </div>
 
-                    {/* Fixed bottom Spotify player */}
+                    {/* Fixed bottom artist player */}
                     {selectedArtist && (
-                        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg z-50">
-                            <div className="relative">
-                                {/* Close button */}
-                                <button
-                                    onClick={handleClosePlayer}
-                                    className="absolute top-2 right-2 z-10 p-1 rounded-full bg-background/80 hover:bg-accent transition-colors"
-                                    aria-label="Close player"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-
-                                {/* Spotify embed container */}
-                                <div ref={embedRef} className="w-full" />
-                            </div>
-                        </div>
+                        <ArtistPlayer
+                            artistName={selectedArtist.name}
+                            spotifyId={selectedArtist.spotifyId}
+                            onClose={() => setSelectedArtist(null)}
+                        />
                     )}
                 </>
             ) : (
