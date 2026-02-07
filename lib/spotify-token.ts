@@ -1,23 +1,9 @@
-import { createClient } from 'redis';
-
-const redis = await createClient({
-    url: process.env.REDIS_URL
-}).connect();
-
-redis.on('error', (err) => console.error('Redis Client Error', err));
-
-const TOKEN_KEY = "spotify_access_token";
+let cachedToken: string | null = null;
+let tokenExpiresAt = 0;
 
 export async function getCachedSpotifyToken(): Promise<string> {
-
-  try {
-    const cachedToken = await redis.get(TOKEN_KEY);
-    if (cachedToken) {
-
-      return cachedToken;
-    }
-  } catch (error) {
-    console.error("Redis cache read error:", error);
+  if (cachedToken && Date.now() < tokenExpiresAt) {
+    return cachedToken;
   }
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -51,15 +37,9 @@ export async function getCachedSpotifyToken(): Promise<string> {
   if (!token || !expiresIn) {
     throw new Error("Invalid token data received from Spotify");
   }
-  
-  try {
-    await redis.set(TOKEN_KEY, token, {
-      EX: expiresIn - 60,
-    });
-    console.log("New Spotify token fetched and cached successfully.");
-  } catch (error) {
-    console.error("Redis cache write error:", error);
-  }
+
+  cachedToken = token;
+  tokenExpiresAt = Date.now() + (expiresIn - 60) * 1000;
 
   return token;
 }
