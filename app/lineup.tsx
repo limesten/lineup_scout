@@ -370,9 +370,9 @@ export default function Lineup({ allLineupData }: LineupProps) {
                         )}
                     </ToggleGroup>
 
-                    <Label htmlFor="tip" className="mt-4">
+                    <p className="mt-4 text-xs">
                         Tip: Click an artist name to play some of their music!
-                    </Label>
+                    </p>
 
                     {/* Main content with bottom padding when player is open */}
                     <div
