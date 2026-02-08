@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
     AVAILABLE_YEARS,
     Year,
@@ -368,6 +369,10 @@ export default function Lineup({ allLineupData }: LineupProps) {
                             ),
                         )}
                     </ToggleGroup>
+
+                    <Label htmlFor="tip" className="mt-4">
+                        Tip: Click an artist name to play some of their music!
+                    </Label>
 
                     {/* Main content with bottom padding when player is open */}
                     <div
