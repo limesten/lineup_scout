@@ -30,8 +30,6 @@ export function ArtistPlayer({
     const [iFrameAPI, setIFrameAPI] = useState<SpotifyIframeApi | undefined>(
         cachedSpotifyApi ?? undefined,
     );
-    const [playerLoaded, setPlayerLoaded] = useState(false);
-
     // Load Spotify iframe API script (once globally)
     useEffect(() => {
         if (scriptLoaded) return;
@@ -58,17 +56,14 @@ export function ArtistPlayer({
         };
     }, [iFrameAPI]);
 
-    // Initialize/update Spotify player
+    // Initialize Spotify player — recreate controller when artist changes
     useEffect(() => {
         if (!iFrameAPI || !embedRef.current || !spotifyId) return;
 
-        if (spotifyControllerRef.current && playerLoaded) {
-            spotifyControllerRef.current.loadUri(`spotify:artist:${spotifyId}`);
-            return;
-        }
+        const element = embedRef.current;
 
         iFrameAPI.createController(
-            embedRef.current,
+            element,
             {
                 width: '100%',
                 height: '352',
@@ -76,17 +71,15 @@ export function ArtistPlayer({
                 theme: 'dark',
             },
             (controller: SpotifyEmbedController) => {
-                controller.addListener('ready', () => setPlayerLoaded(true));
                 spotifyControllerRef.current = controller;
             },
         );
 
         return () => {
-            if (spotifyControllerRef.current) {
-                spotifyControllerRef.current.removeListener('ready');
-            }
+            spotifyControllerRef.current = null;
+            element.innerHTML = '';
         };
-    }, [iFrameAPI, spotifyId, playerLoaded]);
+    }, [iFrameAPI, spotifyId]);
 
     // Pause Spotify when switching to YouTube tab
     useEffect(() => {

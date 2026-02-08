@@ -21,4 +21,4 @@ Use shadcn UI components whenever possible. Before creating a new component, sea
 
 # Rules
 
-Run pnpm run build before finishing to make sure there are no build errors.
+Run pnpm run build before finishing larger changes to make sure there are no build errors.

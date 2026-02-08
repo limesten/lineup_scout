@@ -442,6 +442,7 @@ export default function Lineup({ allLineupData }: LineupProps) {
                     {/* Fixed bottom artist player */}
                     {selectedArtist && (
                         <ArtistPlayer
+                            key={selectedArtist.name}
                             artistName={selectedArtist.name}
                             spotifyId={selectedArtist.spotifyId}
                             onClose={() => setSelectedArtist(null)}
