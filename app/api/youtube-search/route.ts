@@ -9,7 +9,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "Missing artistName" }, { status: 400 });
     }
 
-    const cached = getCachedResults(artistName);
+    const cached = await getCachedResults(artistName);
     if (cached) {
         return NextResponse.json({ items: cached });
     }
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
                 item.snippet.title.toLowerCase().includes(artistLower)
             )
             .slice(0, 5);
-        setCachedResults(artistName, items);
+        await setCachedResults(artistName, items);
         return NextResponse.json({ items });
     } catch (err) {
         console.error("YouTube API error:", err);

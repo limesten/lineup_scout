@@ -1,4 +1,4 @@
-import { text, date, bigint, timestamp, pgTable, primaryKey } from "drizzle-orm/pg-core";
+import { text, date, bigint, timestamp, pgTable, primaryKey, jsonb } from "drizzle-orm/pg-core";
 
 export const stagesTable = pgTable("stages", {
     id: bigint({ mode: "number" }).primaryKey(),
@@ -54,3 +54,9 @@ export const stageHostsTable = pgTable(
     },
     (table) => [primaryKey({ columns: [table.stageId, table.date] })]
 );
+
+export const youtubeCacheTable = pgTable("youtube_cache", {
+    artistName: text("artist_name").primaryKey(),
+    results: jsonb("results").notNull(),
+    cachedAt: timestamp("cached_at", { withTimezone: true }).notNull().defaultNow(),
+});

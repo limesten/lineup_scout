@@ -15,6 +15,13 @@
       "when": 1770470572367,
       "tag": "0001_fearless_sumo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770546381886,
+      "tag": "0002_needy_albert_cleary",
+      "breakpoints": true
     }
   ]
 }
