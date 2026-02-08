@@ -1,5 +1,1 @@
-- Fix duplicate artist id and stage id
-
 - Fix BOU + B
-
-- BUG: W2 Fri, click Xijaro - then click domire planaxis, then click spotify tab
