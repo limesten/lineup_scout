@@ -98,7 +98,7 @@ export function ArtistPlayer({
 
     return (
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg z-50">
-            <div className="relative">
+            <div className="relative max-w-screen-2xl mx-auto">
                 {/* Close button */}
                 <button
                     onClick={handleClose}
