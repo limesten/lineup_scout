@@ -33,9 +33,11 @@ export async function GET(request: Request) {
         const data = await response.json();
         const allItems = data.items || [];
         const artistLower = artistName.toLowerCase();
+        const decodeHtml = (s: string) =>
+            s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
         const items = allItems
             .filter((item: { snippet: { title: string } }) =>
-                item.snippet.title.toLowerCase().includes(artistLower)
+                decodeHtml(item.snippet.title).toLowerCase().includes(artistLower)
             )
             .slice(0, 5);
         await setCachedResults(artistName, items);

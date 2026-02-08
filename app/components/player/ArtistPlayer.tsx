@@ -150,7 +150,8 @@ export function ArtistPlayer({
                         </div>
                         {!spotifyId && (
                             <div className="flex items-center justify-center h-[352px] text-muted-foreground">
-                                No Spotify results found for &ldquo;{artistName}&rdquo;, try the YouTube tab instead!
+                                No Spotify results found for &ldquo;{artistName}
+                                &rdquo;
                             </div>
                         )}
                     </TabsContent>

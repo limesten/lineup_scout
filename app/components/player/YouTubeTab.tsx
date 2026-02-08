@@ -6,6 +6,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { YouTubeSearchResult } from '@/lib/youtube-types';
 
+const decodeHtml = (s: string) =>
+    s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+
 interface YouTubeTabProps {
     artistName: string;
 }
@@ -103,10 +106,10 @@ export function YouTubeTab({ artistName }: YouTubeTabProps) {
                             />
                             <div className="min-w-0 flex-1">
                                 <p className="text-xs font-medium line-clamp-2">
-                                    {result.snippet.title}
+                                    {decodeHtml(result.snippet.title)}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground truncate">
-                                    {result.snippet.channelTitle}
+                                    {decodeHtml(result.snippet.channelTitle)}
                                 </p>
                             </div>
                         </button>

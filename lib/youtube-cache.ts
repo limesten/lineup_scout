@@ -23,7 +23,6 @@ export async function getCachedResults(
     // L1: Check in-memory cache first
     const memEntry = memoryCache.get(key);
     if (memEntry && Date.now() < memEntry.expiresAt) {
-        console.log(`[YT Cache] HIT L1 (memory) for "${key}"`);
         return memEntry.results;
     }
     memoryCache.delete(key);
@@ -43,9 +42,6 @@ export async function getCachedResults(
 
             if (Date.now() < expiresAt) {
                 const results = row.results as YouTubeSearchResult[];
-                console.log(
-                    `[YT Cache] HIT L2 (database) for "${key}" — cached ${Math.round((Date.now() - cachedAtMs) / 3600000)}h ago`,
-                );
                 // Populate L1 for subsequent requests in this process
                 memoryCache.set(key, { results, expiresAt });
                 return results;
@@ -55,7 +51,6 @@ export async function getCachedResults(
         console.error('Failed to read YouTube cache from DB:', err);
     }
 
-    console.log(`[YT Cache] MISS for "${key}" — calling YouTube API`);
     return null;
 }
 
