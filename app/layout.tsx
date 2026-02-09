@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'Tomorrowland 2025 Lineup Explorer',
+    title: 'Tomorrowland Lineup Explorer',
     description: 'Find your vibe',
 };
 
