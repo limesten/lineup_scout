@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+
 import {
     AVAILABLE_YEARS,
     Year,
