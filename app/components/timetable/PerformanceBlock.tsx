@@ -56,7 +56,7 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
                        flex flex-col justify-center"
             style={{
                 left: `${leftPercent}%`,
-                width: `${widthPercent}%`,
+                width: `calc(${widthPercent}% - 3px)`,
             }}
         >
             <div className="text-xs font-medium truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
