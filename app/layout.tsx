@@ -35,19 +35,6 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     {children}
-                    <a
-                        href="https://ko-fi.com/B0B51TUT8Y"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="fixed bottom-4 right-4 z-40 transition-opacity hover:opacity-80"
-                    >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            className="h-6 sm:h-9 border-0"
-                            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
-                            alt="Buy Me a Coffee at ko-fi.com"
-                        />
-                    </a>
                     <Analytics />
                 </ThemeProvider>
             </body>
