@@ -53,7 +53,7 @@ const STAGE_ORDER = [
 
 export default function Lineup({ allLineupData }: LineupProps) {
     const [selectedYear, setSelectedYear] = useState<Year>(2026);
-    const [viewMode, setViewMode] = useState<ViewMode>('grid');
+    const [viewMode, setViewMode] = useState<ViewMode>('timetable');
     const [selectedWeekend, setSelectedWeekend] =
         useState<Weekend>('WEEKEND_1');
 
