@@ -2,11 +2,6 @@
 
 import type { TimeTablePerformance, Artist } from "@/lib/db-types";
 import { formatMinutesToTime } from "@/lib/timetable-utils";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface PerformanceBlockProps {
     performance: TimeTablePerformance;
@@ -53,38 +48,23 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
     );
 
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <div
-                    className="absolute top-1 bottom-1 rounded-md px-2 py-1
-                               bg-card border border-border
-                               hover:bg-accent hover:border-accent-foreground/50
-                               transition-colors overflow-hidden
-                               flex flex-col justify-center"
-                    style={{
-                        left: `${leftPercent}%`,
-                        width: `${widthPercent}%`,
-                        minWidth: "60px",
-                    }}
-                >
-                    <div className="text-xs font-medium truncate">
-                        {renderArtistNames("")}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground hidden sm:block truncate">
-                        {startTime} - {endTime}
-                    </div>
-                </div>
-            </TooltipTrigger>
-            <TooltipContent
-                side="top"
-                className="bg-card border border-border text-foreground p-2 max-w-xs"
-                sideOffset={0}
-                showArrow={false}
-            >
-                <div className="text-sm font-medium">
-                    {renderArtistNames("")}
-                </div>
-            </TooltipContent>
-        </Tooltip>
+        <div
+            className="group absolute top-1 bottom-1 z-10 rounded-md px-2 py-1
+                       bg-card border border-border
+                       hover:z-30 hover:min-w-fit hover:bg-accent hover:border-accent-foreground/50
+                       transition-all overflow-hidden hover:overflow-visible
+                       flex flex-col justify-center"
+            style={{
+                left: `${leftPercent}%`,
+                width: `${widthPercent}%`,
+            }}
+        >
+            <div className="text-xs font-medium truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
+                {renderArtistNames("")}
+            </div>
+            <div className="text-[10px] text-muted-foreground hidden sm:block truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
+                {startTime} - {endTime}
+            </div>
+        </div>
     );
 }
