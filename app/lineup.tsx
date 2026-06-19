@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -17,10 +17,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { LayoutGrid, CalendarDays } from 'lucide-react';
+import { LayoutGrid, CalendarDays, Columns3 } from 'lucide-react';
 
 import { CompleteLineup, LineupPerformance } from '@/lib/db-types';
-import { TimeTableView } from './components/timetable';
+import { TimeTableView, VerticalTimeTableView } from './components/timetable';
 import { ArtistPlayer } from './components/player';
 import {
     transformToTimeTableData,
@@ -31,7 +31,7 @@ interface LineupProps {
     allLineupData: Record<Year, CompleteLineup>;
 }
 
-type ViewMode = 'timetable' | 'grid';
+type ViewMode = 'timetable' | 'timetable-vertical' | 'grid';
 
 const STAGE_ORDER = [
     'MAINSTAGE',
@@ -70,6 +70,16 @@ export default function Lineup({ allLineupData }: LineupProps) {
         name: string;
         spotifyId: string | null;
     } | null>(null);
+
+    // Default to the vertical timetable on mobile-sized screens.
+    useEffect(() => {
+        if (
+            typeof window !== 'undefined' &&
+            window.matchMedia('(max-width: 767px)').matches
+        ) {
+            setViewMode('timetable-vertical');
+        }
+    }, []);
 
     const handleWeekendChange = (newWeekend: Weekend) => {
         if (!newWeekend) {
@@ -276,7 +286,7 @@ export default function Lineup({ allLineupData }: LineupProps) {
     }, [selectedDate, getPerformancesByDate]);
 
     return (
-        <div className="container mx-auto px-4 flex flex-col items-center">
+        <div className="container mx-auto px-2 md:px-4 flex flex-col items-center">
             {/* Year Dropdown */}
             <div className="mb-4">
                 <Select
@@ -340,6 +350,14 @@ export default function Lineup({ allLineupData }: LineupProps) {
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 variant="outline"
+                                value="timetable-vertical"
+                                className="cursor-pointer px-4"
+                            >
+                                <Columns3 className="h-4 w-4 mr-2" />
+                                Vertical
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                                variant="outline"
                                 value="grid"
                                 className="cursor-pointer px-4"
                             >
@@ -379,7 +397,8 @@ export default function Lineup({ allLineupData }: LineupProps) {
                         className={`mt-5 w-full ${selectedArtist ? 'pb-[440px]' : ''}`}
                     >
                         {/* Timetable View */}
-                        {viewMode === 'timetable' &&
+                        {(viewMode === 'timetable' ||
+                            viewMode === 'timetable-vertical') &&
                             showTimesNotReleasedMessage && (
                                 <p className="text-center text-muted-foreground mt-8">
                                     Set times have not been released yet — check
@@ -388,6 +407,12 @@ export default function Lineup({ allLineupData }: LineupProps) {
                             )}
                         {viewMode === 'timetable' && timeTableData && (
                             <TimeTableView
+                                data={timeTableData}
+                                onArtistClick={handleArtistClick}
+                            />
+                        )}
+                        {viewMode === 'timetable-vertical' && timeTableData && (
+                            <VerticalTimeTableView
                                 data={timeTableData}
                                 onArtistClick={handleArtistClick}
                             />

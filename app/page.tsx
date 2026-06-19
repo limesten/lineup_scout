@@ -25,7 +25,7 @@ export default async function Home() {
     const allLineupData = await getAllLineupData();
 
     return (
-        <div className="container mx-auto px-4 flex flex-col items-center">
+        <div className="container mx-auto px-2 md:px-4 flex flex-col items-center">
             <h1 className="text-2xl font-bold mt-4">
                 Tomorrowland Lineup Explorer
             </h1>
