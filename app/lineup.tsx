@@ -26,6 +26,7 @@ import {
     transformToTimeTableData,
     isPlaceholderTime,
 } from '@/lib/timetable-utils';
+import { getStageColor } from '@/lib/stage-colors';
 
 interface LineupProps {
     allLineupData: Record<Year, CompleteLineup>;
@@ -428,10 +429,19 @@ export default function Lineup({ allLineupData }: LineupProps) {
                                         ([
                                             stageName,
                                             { stageHost, performances },
-                                        ]) => (
+                                        ]) => {
+                                            const stageColor =
+                                                getStageColor(stageName);
+                                            return (
                                             <Card
                                                 key={stageName}
                                                 className="mb-6 text-center break-inside-avoid"
+                                                style={{
+                                                    backgroundColor:
+                                                        stageColor.background,
+                                                    borderColor:
+                                                        stageColor.border,
+                                                }}
                                             >
                                                 <CardHeader>
                                                     <CardTitle>
@@ -463,7 +473,8 @@ export default function Lineup({ allLineupData }: LineupProps) {
                                                     </ul>
                                                 </CardContent>
                                             </Card>
-                                        ),
+                                            );
+                                        },
                                     )}
                             </div>
                         )}

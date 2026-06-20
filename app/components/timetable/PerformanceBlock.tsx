@@ -2,6 +2,7 @@
 
 import type { TimeTablePerformance, Artist } from "@/lib/db-types";
 import { formatMinutesToTime } from "@/lib/timetable-utils";
+import { getStageColor } from "@/lib/stage-colors";
 
 interface PerformanceBlockProps {
     performance: TimeTablePerformance;
@@ -21,6 +22,7 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
     const separator = getSeparator();
     const startTime = formatMinutesToTime(startMinutes);
     const endTime = formatMinutesToTime(startMinutes + durationMinutes);
+    const stageColor = getStageColor(performance.stage.name);
 
     function handleArtistClick(e: React.MouseEvent, artist: Artist) {
         e.stopPropagation();
@@ -50,13 +52,15 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
     return (
         <div
             className="group absolute top-1 bottom-1 z-10 rounded-md px-2 py-1
-                       bg-card border border-border
-                       hover:z-20 hover:min-w-fit hover:bg-accent hover:border-accent-foreground/50
+                       border
+                       hover:z-20 hover:min-w-fit hover:brightness-125
                        transition-all overflow-hidden hover:overflow-visible
                        flex flex-col justify-center"
             style={{
                 left: `${leftPercent}%`,
                 width: `calc(${widthPercent}% - 3px)`,
+                backgroundColor: stageColor.background,
+                borderColor: stageColor.border,
             }}
         >
             <div className="text-xs font-medium truncate group-hover:overflow-visible group-hover:whitespace-nowrap">

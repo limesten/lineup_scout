@@ -2,6 +2,7 @@
 
 import type { TimeTablePerformance, Artist } from "@/lib/db-types";
 import { formatMinutesToTime } from "@/lib/timetable-utils";
+import { getStageColor } from "@/lib/stage-colors";
 
 interface VerticalPerformanceBlockProps {
     performance: TimeTablePerformance;
@@ -23,6 +24,7 @@ export function VerticalPerformanceBlock({ performance, onArtistClick }: Vertica
     const separator = getSeparator();
     const startTime = formatMinutesToTime(startMinutes);
     const endTime = formatMinutesToTime(startMinutes + durationMinutes);
+    const stageColor = getStageColor(performance.stage.name);
 
     function handleArtistClick(e: React.MouseEvent, artist: Artist) {
         e.stopPropagation();
@@ -33,13 +35,15 @@ export function VerticalPerformanceBlock({ performance, onArtistClick }: Vertica
     return (
         <div
             className="group absolute left-1 right-1 z-10 rounded-md px-2 py-1
-                       bg-card border border-border
-                       hover:z-30 hover:bg-accent hover:border-accent-foreground/50
-                       transition-colors overflow-hidden
+                       border
+                       hover:z-30 hover:brightness-125
+                       transition-all overflow-hidden
                        flex flex-col justify-center"
             style={{
                 top: `${leftPercent}%`,
                 height: `calc(${widthPercent}% - 3px)`,
+                backgroundColor: stageColor.background,
+                borderColor: stageColor.border,
             }}
         >
             <div className="text-xs font-medium leading-tight line-clamp-2">
