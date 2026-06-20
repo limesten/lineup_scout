@@ -8,7 +8,7 @@ interface StageLabelProps {
 export function StageLabel({ name, stageHost }: StageLabelProps) {
     return (
         <div
-            className="sticky left-0 w-36 md:w-44 shrink-0 bg-background z-10
+            className="sticky left-0 w-36 md:w-44 shrink-0 bg-background z-30
                        flex flex-col justify-center px-3 border-r border-border"
         >
             <span className="text-xs md:text-sm font-medium truncate" title={name}>

@@ -14,7 +14,7 @@ export function TimeTableHeader({ timeRange }: TimeTableHeaderProps) {
     return (
         <div className="sticky top-0 z-20 flex h-10 bg-background border-b border-border">
             {/* Sticky corner cell */}
-            <div className="sticky left-0 w-36 md:w-44 shrink-0 bg-background z-30 border-r border-border" />
+            <div className="sticky left-0 w-36 md:w-44 shrink-0 bg-background z-40 border-r border-border" />
             {/* Hour markers */}
             <div className="flex-1 flex">
                 {hours.map((hour) => (

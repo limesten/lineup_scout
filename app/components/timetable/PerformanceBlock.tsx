@@ -51,7 +51,7 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
         <div
             className="group absolute top-1 bottom-1 z-10 rounded-md px-2 py-1
                        bg-card border border-border
-                       hover:z-30 hover:min-w-fit hover:bg-accent hover:border-accent-foreground/50
+                       hover:z-20 hover:min-w-fit hover:bg-accent hover:border-accent-foreground/50
                        transition-all overflow-hidden hover:overflow-visible
                        flex flex-col justify-center"
             style={{
