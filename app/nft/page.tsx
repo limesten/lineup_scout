@@ -20,12 +20,14 @@ export default async function NftPage() {
 
     return (
         <div className="container mx-auto flex flex-col items-center px-2 md:px-4">
-            <h1 className="mt-4 text-2xl font-bold">Tomorrowland NFT</h1>
-            <p className="text-md mb-4 italic text-muted-foreground">
-                Floor price of the 3 access tokens, tracked daily
-            </p>
+            <div className="w-full max-w-7xl">
+                <h1 className="mt-4 text-2xl font-bold">
+                    Tomorrowland NFT Price Chart
+                </h1>
+                <p className="text-md mb-4 italic text-muted-foreground">
+                    Floor price of the 3 access tokens, tracked daily
+                </p>
 
-            <div className="w-full max-w-5xl">
                 <PriceChart
                     combined={combined}
                     perToken={perToken}

@@ -101,7 +101,7 @@ export function PriceChart({ combined, perToken, current }: PriceChartProps) {
                             key={key}
                             variant="outline"
                             value={key}
-                            className="cursor-pointer"
+                            className="flex-none cursor-pointer whitespace-nowrap px-4"
                         >
                             {PRICE_KEY_LABELS[key]}
                         </ToggleGroupItem>
@@ -112,7 +112,7 @@ export function PriceChart({ combined, perToken, current }: PriceChartProps) {
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="h-[450px] w-full"
+                    className="h-[600px] w-full"
                 >
                     <AreaChart data={chartData} margin={{ left: 8, right: 8 }}>
                         <defs>
