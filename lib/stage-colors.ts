@@ -9,6 +9,8 @@
 export interface StageColor {
     /** Translucent fill for block / card backgrounds. */
     background: string;
+    /** Opaque fill used on hover so overlapping blocks don't bleed through. */
+    backgroundSolid: string;
     /** Slightly more opaque tone for borders. */
     border: string;
 }
@@ -51,6 +53,9 @@ export function getStageColor(stageName: string): StageColor {
 
     return {
         background: `hsl(${hue} 65% 45% / 0.22)`,
+        // Opaque tone roughly matching the translucent fill composited over the
+        // dark page background, so hovering removes transparency cleanly.
+        backgroundSolid: `hsl(${hue} 45% 16%)`,
         border: `hsl(${hue} 60% 60% / 0.55)`,
     };
 }

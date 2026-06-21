@@ -35,16 +35,17 @@ export function VerticalPerformanceBlock({ performance, onArtistClick }: Vertica
     return (
         <div
             className="group absolute left-1 right-1 z-10 rounded-md px-2 py-1
-                       border
+                       border bg-[var(--block-bg)] hover:bg-[var(--block-bg-solid)]
                        hover:z-30 hover:brightness-125
                        transition-all overflow-hidden
                        flex flex-col justify-center"
             style={{
                 top: `${leftPercent}%`,
                 height: `calc(${widthPercent}% - 3px)`,
-                backgroundColor: stageColor.background,
+                ["--block-bg" as string]: stageColor.background,
+                ["--block-bg-solid" as string]: stageColor.backgroundSolid,
                 borderColor: stageColor.border,
-            }}
+            } as React.CSSProperties}
         >
             <div className="text-xs font-medium leading-tight line-clamp-2">
                 {artists.map((artist, index) => (

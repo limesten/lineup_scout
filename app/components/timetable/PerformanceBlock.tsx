@@ -52,16 +52,17 @@ export function PerformanceBlock({ performance, onArtistClick }: PerformanceBloc
     return (
         <div
             className="group absolute top-1 bottom-1 z-10 rounded-md px-2 py-1
-                       border
+                       border bg-[var(--block-bg)] hover:bg-[var(--block-bg-solid)]
                        hover:z-20 hover:min-w-fit hover:brightness-125
                        transition-all overflow-hidden hover:overflow-visible
                        flex flex-col justify-center"
             style={{
                 left: `${leftPercent}%`,
                 width: `calc(${widthPercent}% - 3px)`,
-                backgroundColor: stageColor.background,
+                ["--block-bg" as string]: stageColor.background,
+                ["--block-bg-solid" as string]: stageColor.backgroundSolid,
                 borderColor: stageColor.border,
-            }}
+            } as React.CSSProperties}
         >
             <div className="text-xs font-medium truncate group-hover:overflow-visible group-hover:whitespace-nowrap">
                 {renderArtistNames("")}
