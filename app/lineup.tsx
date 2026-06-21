@@ -17,7 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { LayoutGrid, CalendarDays, Columns3 } from 'lucide-react';
+import { LayoutGrid, CalendarDays, Columns3, Lightbulb } from 'lucide-react';
 
 import { CompleteLineup, LineupPerformance } from '@/lib/db-types';
 import { TimeTableView, VerticalTimeTableView } from './components/timetable';
@@ -288,8 +288,9 @@ export default function Lineup({ allLineupData }: LineupProps) {
 
     return (
         <div className="container mx-auto px-2 md:px-4 flex flex-col items-center">
-            {/* Year Dropdown */}
-            <div className="mb-4">
+            {/* Controls row: Year | Weekend | Date | View */}
+            <div className="flex flex-wrap gap-4 items-center justify-start w-full mt-4 mb-2">
+                {/* Year Dropdown */}
                 <Select
                     value={selectedYear.toString()}
                     onValueChange={handleYearChange}
@@ -305,12 +306,9 @@ export default function Lineup({ allLineupData }: LineupProps) {
                         ))}
                     </SelectContent>
                 </Select>
-            </div>
 
-            {/* Show controls and content only if year has data */}
-            {hasLineupData ? (
-                <>
-                    <div className="flex flex-wrap gap-4 items-center justify-center mb-2">
+                {hasLineupData && (
+                    <>
                         {/* Weekend Toggle */}
                         <ToggleGroup
                             type="single"
@@ -331,6 +329,28 @@ export default function Lineup({ allLineupData }: LineupProps) {
                             >
                                 Weekend 2
                             </ToggleGroupItem>
+                        </ToggleGroup>
+
+                        {/* Date Toggle */}
+                        <ToggleGroup
+                            type="single"
+                            value={selectedDate || ''}
+                            onValueChange={setSelectedDate}
+                        >
+                            {lineupDatesForYear[selectedWeekend].map(
+                                (date: string) => (
+                                    <ToggleGroupItem
+                                        key={date}
+                                        variant="outline"
+                                        value={date}
+                                        className="cursor-pointer"
+                                    >
+                                        <p suppressHydrationWarning>
+                                            {formatDate(date)}
+                                        </p>
+                                    </ToggleGroupItem>
+                                ),
+                            )}
                         </ToggleGroup>
 
                         {/* View Mode Toggle */}
@@ -366,32 +386,22 @@ export default function Lineup({ allLineupData }: LineupProps) {
                                 Grid
                             </ToggleGroupItem>
                         </ToggleGroup>
-                    </div>
 
-                    <ToggleGroup
-                        type="single"
-                        value={selectedDate || ''}
-                        onValueChange={setSelectedDate}
-                    >
-                        {lineupDatesForYear[selectedWeekend].map(
-                            (date: string) => (
-                                <ToggleGroupItem
-                                    key={date}
-                                    variant="outline"
-                                    value={date}
-                                    className="cursor-pointer"
-                                >
-                                    <p suppressHydrationWarning>
-                                        {formatDate(date)}
-                                    </p>
-                                </ToggleGroupItem>
-                            ),
-                        )}
-                    </ToggleGroup>
+                        {/* Tip */}
+                        <div className="ml-auto flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground">
+                            <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+                            <span>
+                                Click an artist name to play some of their
+                                music!
+                            </span>
+                        </div>
+                    </>
+                )}
+            </div>
 
-                    <p className="mt-4 text-xs">
-                        Tip: Click an artist name to play some of their music!
-                    </p>
+            {/* Show content only if year has data */}
+            {hasLineupData ? (
+                <>
 
                     {/* Main content with bottom padding when player is open */}
                     <div

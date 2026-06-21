@@ -9,8 +9,18 @@ import {
     stageHostsTable,
 } from "@/server/db/schema";
 import { getAllDatesForYear, getLineupDates, Year } from "@/lib/lineup-settings";
-import { eq, inArray, desc } from "drizzle-orm";
+import { eq, inArray, desc, sql } from "drizzle-orm";
 import type { Artist, CompleteLineup, LineupPerformance } from "@/lib/db-types";
+import {
+    CURRENCIES,
+    TAKER_FEE,
+    TOKEN_SYMBOLS,
+    type Currency,
+    type CurrentPrices,
+    type PriceHistory,
+    type PriceKey,
+    type TokenSymbol,
+} from "@/lib/nft";
 
 export async function getCompleteLineup(year: Year = 2025): Promise<CompleteLineup> {
     const allDatesForYear = getAllDatesForYear(year);
@@ -107,5 +117,97 @@ export async function getCompleteLineup(year: Year = 2025): Promise<CompleteLine
         result[weekend].push(lineupPerformance);
     });
 
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// NFT price queries (read from the v_prices_per_date / v_combined_price_per_date
+// views). Chart history is raw; current prices include the 2.5% taker fee.
+// ---------------------------------------------------------------------------
+
+interface HistoryRow {
+    date: string;
+    sol: number;
+    eur: number;
+    usd: number;
+    gbp: number;
+    sek: number;
+}
+
+function toPriceHistory(rows: HistoryRow[]): PriceHistory {
+    const currencies = {} as Record<Currency, number[]>;
+    for (const c of CURRENCIES) {
+        const key = c.toLowerCase() as keyof HistoryRow;
+        currencies[c] = rows.map((r) => Number(r[key]));
+    }
+    return { dates: rows.map((r) => r.date), currencies };
+}
+
+export async function getCombinedPriceHistory(): Promise<PriceHistory> {
+    const { rows } = await db.execute(sql`
+        select date::text as date, sol, eur, usd, gbp, sek
+        from v_combined_price_per_date
+        order by date
+    `);
+    return toPriceHistory(rows as unknown as HistoryRow[]);
+}
+
+export async function getPerTokenPriceHistory(): Promise<
+    Record<TokenSymbol, PriceHistory>
+> {
+    const { rows } = await db.execute(sql`
+        select date::text as date, token, sol, eur, usd, gbp, sek
+        from v_prices_per_date
+        order by date
+    `);
+    const typedRows = rows as unknown as (HistoryRow & {
+        token: TokenSymbol;
+    })[];
+
+    const result = {} as Record<TokenSymbol, PriceHistory>;
+    for (const token of TOKEN_SYMBOLS) {
+        result[token] = toPriceHistory(
+            typedRows.filter((r) => r.token === token)
+        );
+    }
+    return result;
+}
+
+export async function getCurrentPrices(): Promise<
+    Record<PriceKey, CurrentPrices>
+> {
+    const { rows: tokenRows } = await db.execute(sql`
+        select distinct on (token) token, sol, eur, usd, gbp, sek
+        from v_prices_per_date
+        order by token, date desc
+    `);
+    const typedTokenRows = tokenRows as unknown as (HistoryRow & {
+        token: TokenSymbol;
+    })[];
+
+    const { rows: combinedRows } = await db.execute(sql`
+        select sol, eur, usd, gbp, sek
+        from v_combined_price_per_date
+        order by date desc
+        limit 1
+    `);
+    const typedCombinedRows = combinedRows as unknown as HistoryRow[];
+
+    const applyFee = (row: HistoryRow): CurrentPrices => {
+        const prices = {} as CurrentPrices;
+        for (const c of CURRENCIES) {
+            const key = c.toLowerCase() as keyof HistoryRow;
+            prices[c] = Math.round(Number(row[key]) * TAKER_FEE * 1000) / 1000;
+        }
+        return prices;
+    };
+
+    const result = {} as Record<PriceKey, CurrentPrices>;
+    for (const row of typedTokenRows) {
+        result[row.token] = applyFee(row);
+    }
+    if (typedCombinedRows[0]) {
+        result.combined = applyFee(typedCombinedRows[0]);
+    }
     return result;
 }

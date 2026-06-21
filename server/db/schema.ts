@@ -1,4 +1,4 @@
-import { text, date, bigint, timestamp, pgTable, primaryKey, jsonb } from "drizzle-orm/pg-core";
+import { text, date, bigint, timestamp, doublePrecision, pgTable, primaryKey, jsonb } from "drizzle-orm/pg-core";
 
 export const stagesTable = pgTable("stages", {
     id: bigint({ mode: "number" }).primaryKey(),
@@ -60,3 +60,25 @@ export const youtubeCacheTable = pgTable("youtube_cache", {
     results: jsonb("results").notNull(),
     cachedAt: timestamp("cached_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// NFT price tracking. One snapshot per (token, date) and (currency, date),
+// matching the daily insert-or-replace semantics of the original Go app.
+export const solRatesTable = pgTable(
+    "sol_rates",
+    {
+        token: text().notNull(),
+        date: date().notNull(),
+        sol: doublePrecision().notNull(),
+    },
+    (table) => [primaryKey({ columns: [table.token, table.date] })]
+);
+
+export const exchangeRatesTable = pgTable(
+    "exchange_rates",
+    {
+        currency: text().notNull(),
+        date: date().notNull(),
+        solExchangeRate: doublePrecision("sol_exchange_rate").notNull(),
+    },
+    (table) => [primaryKey({ columns: [table.currency, table.date] })]
+);

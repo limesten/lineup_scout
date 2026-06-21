@@ -1,9 +1,11 @@
 # Project Overview
 
-Tomorrowland lineup explorer. View Lineup based on year, weekend and date.
-User can view lineup in Grid view or Timetable view (horizontal and vertical)
+Tomorrowland Wizard: a multi-page Tomorrowland companion app. Top navbar (app/components/layout/Navbar.tsx) switches between pages.
 
-Unique feature: User can press an artist name to get a spotify iframe for that artist with their top songs. It will also show youtube search results for live sets for that artist that the user can play. The purpose is to quickly be able to get a feel for the type of music that artist produces to get a sense if that is a set you want to be at or not during the festival. This helps plan the visit for each festival goer.
+Lineup (home, `/`): view lineup by year, weekend and date in Grid or Timetable view (horizontal and vertical).
+Unique feature: press an artist name to get a spotify iframe of their top songs plus youtube live-set results, to quickly judge whether to attend that set.
+
+NFT (`/nft`): floor-price chart for the 3 Tomorrowland access tokens (combined + per-token, multi-currency). Data ingested daily from Magic Eden (floor in SOL) + FX Rates API (SOL->fiat) into the `sol_rates`/`exchange_rates` tables; read via the `v_prices_per_date` / `v_combined_price_per_date` views (server/queries.ts). Daily refresh is a Vercel Cron (vercel.json) hitting `/api/nft/refresh`, authed with `CRON_SECRET`. Requires env: `FX_RATES_API_KEY`, `CRON_SECRET`. Postgres views are not managed by drizzle-kit; edit drizzle/nft-views.sql and re-apply with `pnpm tsx scripts/apply-nft-views.ts`.
 
 # Tech Stack
 

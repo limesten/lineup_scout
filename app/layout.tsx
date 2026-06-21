@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
+import { Navbar } from './components/layout/Navbar';
 import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'Tomorrowland Lineup Explorer',
-    description: 'Find your vibe',
+    title: 'Tomorrowland Wizard',
+    description: 'Plan your Tomorrowland: explore the lineup and track the NFT price',
 };
 
 export default function RootLayout({
@@ -34,6 +35,7 @@ export default function RootLayout({
                     forcedTheme="dark"
                     disableTransitionOnChange
                 >
+                    <Navbar />
                     {children}
                     <Analytics />
                 </ThemeProvider>
